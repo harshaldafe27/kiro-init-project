@@ -46,20 +46,21 @@ const register = async (req, res) => {
             adminCode
         } = req.body;
 
-        // Role validation
         const allowedRoles = ['student', 'admin', 'principal'];
         const requestedRole = allowedRoles.includes(role) ? role : 'student';
 
-        // Admin/Principal require a secret code
-        if (requestedRole === 'admin' || requestedRole === 'principal') {
+        if (requestedRole === 'admin') {
             const validCode = process.env.ADMIN_SECRET_CODE || 'eventflex@admin2024';
-            if (adminCode !== validCode) {
-                return errorResponse(res, 'Invalid admin code', 403);
-            }
+            if (adminCode !== validCode) return errorResponse(res, 'Invalid admin code', 403);
+        }
+        if (requestedRole === 'principal') {
+            const validCode = process.env.PRINCIPAL_SECRET_CODE || 'eventflex@principal2024';
+            if (adminCode !== validCode) return errorResponse(res, 'Invalid principal code', 403);
         }
 
         const existing = await Users.findByEmail(email);
         if (existing) return errorResponse(res, 'Email already in use', 409);
+
         const hashed = await bcrypt.hash(password, 10);
         const user = await Users.create({
             name,
@@ -68,6 +69,7 @@ const register = async (req, res) => {
             role: requestedRole,
             college: college || ''
         });
+
         const payload = {
             _id: user._id,
             role: user.role

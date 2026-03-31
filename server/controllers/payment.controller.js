@@ -18,9 +18,8 @@ const createOrder = async (req, res) => {
             eventId
         } = req.body;
         const event = await Events.findById(eventId);
-        if (!event || !event.isPublished || event.isCancelled) return errorResponse(res, 'Event not available', 404);
+        if (!event || event.isCancelled) return errorResponse(res, 'Event not available', 404);
         if (event.fee <= 0) return errorResponse(res, 'This event is free', 400);
-        if (new Date(event.date) <= new Date()) return errorResponse(res, 'Deadline passed', 400);
         if (event.registeredCount >= event.capacity) return errorResponse(res, 'Event is full', 400);
 
         const existing = await Registrations.findDuplicate(req.user._id, eventId);

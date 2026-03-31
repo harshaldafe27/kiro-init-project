@@ -1,16 +1,13 @@
 /**
  * Firestore collection helpers — replaces Mongoose models.
- * All IDs are Firestore auto-generated document IDs.
+ * Uses in-memory sorting to avoid composite index requirements.
  */
 const {
     getDB
 } = require('../config/firebase');
 const {
-    FieldValue,
-    Timestamp
+    FieldValue
 } = require('firebase-admin/firestore');
-
-// ─── Generic helpers ────────────────────────────────────────────────────────
 
 const col = (name) => getDB().collection(name);
 
@@ -23,6 +20,12 @@ const docToObj = (doc) => {
 };
 
 const snapToArr = (snap) => snap.docs.map(docToObj);
+
+const sortByDate = (arr, field = 'createdAt', dir = 'desc') => [...arr].sort((a, b) => {
+    const av = a[field] || '';
+    const bv = b[field] || '';
+    return dir === 'desc' ? bv.localeCompare(av) : av.localeCompare(bv);
+});
 
 // ─── Users ───────────────────────────────────────────────────────────────────
 
@@ -53,8 +56,9 @@ const Users = {
         limit = 10,
         offset = 0
     } = {}) {
-        const snap = await col('users').orderBy('createdAt', 'desc').offset(offset).limit(limit).get();
-        return snapToArr(snap);
+        const snap = await col('users').get();
+        const all = sortByDate(snapToArr(snap));
+        return all.slice(offset, offset + limit);
     },
     async count() {
         const snap = await col('users').count().get();
@@ -82,7 +86,7 @@ const Events = {
         const now = new Date().toISOString();
         const event = {
             registeredCount: 0,
-            isPublished: false,
+            isPublished: true,
             isCancelled: false,
             fee: 0,
             ...data,
@@ -104,10 +108,10 @@ const Events = {
         limit = 10,
         offset = 0
     } = {}) {
-        let q = col('events').where('isPublished', '==', true).where('isCancelled', '==', false);
-        if (category) q = q.where('category', '==', category);
-        const snap = await q.orderBy('date', 'asc').get();
-        let results = snapToArr(snap);
+        // Fetch ALL events, filter entirely in memory — zero Firestore index requirements
+        const snap = await col('events').get();
+        let results = snapToArr(snap).filter((e) => e.isCancelled !== true);
+        if (category) results = results.filter((e) => e.category === category);
         if (search) {
             const s = search.toLowerCase();
             results = results.filter((e) =>
@@ -116,18 +120,19 @@ const Events = {
                 (e.tags && e.tags.some((t) => t.toLowerCase().includes(s)))
             );
         }
-        const total = results.length;
+        results = sortByDate(results, 'date', 'asc');
         return {
             events: results.slice(offset, offset + limit),
-            total
+            total: results.length
         };
     },
     async findByAdmin(adminId, {
         limit = 50,
         offset = 0
     } = {}) {
-        const snap = await col('events').where('createdBy', '==', adminId).orderBy('createdAt', 'desc').get();
-        const all = snapToArr(snap);
+        // Filter by createdBy, sort in memory to avoid composite index
+        const snap = await col('events').where('createdBy', '==', adminId).get();
+        const all = sortByDate(snapToArr(snap));
         return {
             events: all.slice(offset, offset + limit),
             total: all.length
@@ -137,8 +142,8 @@ const Events = {
         limit = 10,
         offset = 0
     } = {}) {
-        const snap = await col('events').orderBy('createdAt', 'desc').get();
-        const all = snapToArr(snap);
+        const snap = await col('events').get();
+        const all = sortByDate(snapToArr(snap));
         return {
             events: all.slice(offset, offset + limit),
             total: all.length
@@ -190,15 +195,12 @@ const Registrations = {
         return docToObj(await col('registrations').doc(id).get());
     },
     async findDuplicate(studentId, eventId) {
-        const snap = await col('registrations')
-            .where('student', '==', studentId)
-            .where('event', '==', eventId)
-            .limit(1).get();
+        const snap = await col('registrations').where('student', '==', studentId).where('event', '==', eventId).limit(1).get();
         return snap.empty ? null : docToObj(snap.docs[0]);
     },
     async findByStudent(studentId) {
-        const snap = await col('registrations').where('student', '==', studentId).orderBy('createdAt', 'desc').get();
-        return snapToArr(snap);
+        const snap = await col('registrations').where('student', '==', studentId).get();
+        return sortByDate(snapToArr(snap));
     },
     async findByEvent(eventId) {
         const snap = await col('registrations').where('event', '==', eventId).get();
@@ -206,7 +208,6 @@ const Registrations = {
     },
     async findByEventIds(eventIds) {
         if (!eventIds.length) return [];
-        // Firestore 'in' supports max 30 items
         const chunks = [];
         for (let i = 0; i < eventIds.length; i += 30) chunks.push(eventIds.slice(i, i + 30));
         const results = [];
@@ -260,8 +261,8 @@ const AuditLogs = {
         limit = 15,
         offset = 0
     } = {}) {
-        const snap = await col('auditLogs').orderBy('createdAt', 'desc').get();
-        const all = snapToArr(snap);
+        const snap = await col('auditLogs').get();
+        const all = sortByDate(snapToArr(snap));
         return {
             logs: all.slice(offset, offset + limit),
             total: all.length

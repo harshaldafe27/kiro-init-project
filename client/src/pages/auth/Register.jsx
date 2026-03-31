@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../config/firebase';
 import AuthLayout from '../../layouts/AuthLayout';
 import { registerApi } from '../../api/auth.api';
 import useStore from '../../store/useStore';
@@ -28,20 +30,39 @@ export default function Register() {
     setError('');
     if (form.password !== form.confirm) return setError('Passwords do not match');
     if (form.password.length < 6) return setError('Password must be at least 6 characters');
-    if (needsCode && !form.adminCode) return setError('Admin code is required for this role');
+    if (needsCode && !form.adminCode) return setError('Secret code is required for this role');
     setLoading(true);
     try {
-      const { data } = await registerApi({
-        name: form.name, email: form.email, password: form.password,
-        college: form.college, role: form.role, adminCode: form.adminCode,
-      });
-      const { user, accessToken } = data.data;
-      window.__accessToken__ = accessToken;
-      setAuth(user, accessToken);
-      toast.success('Account created!');
-      navigate(roleHome[user.role] || '/student');
+      // Step 1: Create Firebase Auth account
+      const firebaseUser = await createUserWithEmailAndPassword(auth, form.email, form.password);
+
+      // Step 2: Register in our backend (stores role, name, college etc.)
+      try {
+        const { data } = await registerApi({
+          name: form.name, email: form.email, password: form.password,
+          college: form.college, role: form.role, adminCode: form.adminCode,
+        });
+        const { user, accessToken } = data.data;
+        window.__accessToken__ = accessToken;
+        setAuth(user, accessToken);
+        toast.success('Account created!');
+        navigate(roleHome[user.role] || '/student');
+      } catch (backendErr) {
+        // If backend fails, delete the Firebase Auth user to keep in sync
+        await firebaseUser.user.delete();
+        throw backendErr;
+      }
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      const code = err.code;
+      if (code === 'auth/email-already-in-use') {
+        setError('User already exists. Please sign in');
+      } else if (code === 'auth/invalid-email') {
+        setError('Please enter a valid email address');
+      } else if (code === 'auth/weak-password') {
+        setError('Password must be at least 6 characters');
+      } else {
+        setError(err.response?.data?.message || 'Registration failed');
+      }
     } finally {
       setLoading(false);
     }
@@ -53,7 +74,6 @@ export default function Register() {
     <AuthLayout>
       <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Create Account</h2>
 
-      {/* Role selector */}
       <div className="grid grid-cols-3 gap-2 mb-5">
         {ROLES.map((r) => (
           <button key={r.value} type="button" onClick={() => setForm({ ...form, role: r.value, adminCode: '' })}
@@ -64,7 +84,6 @@ export default function Register() {
             }`}>
             <span className="text-xl mb-1">{r.icon}</span>
             <span className="text-xs font-semibold text-gray-800 dark:text-white">{r.label}</span>
-            <span className="text-xs text-gray-400 hidden sm:block mt-0.5 leading-tight">{r.desc}</span>
           </button>
         ))}
       </div>
@@ -96,10 +115,11 @@ export default function Register() {
         {needsCode && (
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Admin Code <span className="text-xs text-gray-400">(required for {form.role} role)</span>
+              {form.role === 'principal' ? 'Principal' : 'Admin'} Secret Code
             </label>
-            <input type="password" required value={form.adminCode} onChange={(e) => setForm({ ...form, adminCode: e.target.value })}
-              placeholder="Enter admin secret code" className={inputClass} />
+            <input type="password" required value={form.adminCode}
+              onChange={(e) => setForm({ ...form, adminCode: e.target.value })}
+              placeholder={`Enter ${form.role} secret code`} className={inputClass} />
           </div>
         )}
 

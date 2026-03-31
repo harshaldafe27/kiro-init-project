@@ -22,7 +22,8 @@ export default function EventForm({ event, onSuccess }) {
     mutationFn: (data) => isEdit ? updateEventApi(event._id, data) : createEventApi(data),
     onSuccess: () => {
       toast.success(isEdit ? 'Event updated!' : 'Event created!');
-      qc.invalidateQueries(['admin-events']);
+      qc.invalidateQueries({ queryKey: ['admin-events'] });
+      qc.invalidateQueries({ queryKey: ['events'] });
       onSuccess?.();
     },
     onError: (err) => setError(err.response?.data?.message || 'Failed to save event'),
@@ -32,7 +33,8 @@ export default function EventForm({ event, onSuccess }) {
     e.preventDefault();
     setError('');
     if (!form.title || !form.date || !form.venue || !form.capacity) return setError('Title, date, venue and capacity are required');
-    mutation.mutate({ ...form, capacity: Number(form.capacity), fee: Number(form.fee), tags: form.tags.split(',').map((t) => t.trim()).filter(Boolean) });
+    // Auto-publish on creation so events are immediately visible to students
+    mutation.mutate({ ...form, capacity: Number(form.capacity), fee: Number(form.fee), tags: form.tags.split(',').map((t) => t.trim()).filter(Boolean), isPublished: true });
   };
 
   const field = (key, label, type = 'text', required = false) => (

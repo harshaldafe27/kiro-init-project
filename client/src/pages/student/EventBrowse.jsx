@@ -13,6 +13,13 @@ import { usePagination } from '../../hooks/usePagination';
 
 const CATEGORIES = ['Technical', 'Cultural', 'Sports', 'Academic', 'Workshop'];
 
+const openRazorpay = (options) =>
+  new Promise((resolve, reject) => {
+    const rzp = new window.Razorpay({ ...options, handler: resolve });
+    rzp.on('payment.failed', reject);
+    rzp.open();
+  });
+
 export default function EventBrowse() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
@@ -30,42 +37,53 @@ export default function EventBrowse() {
     queryFn: () => getMyRegistrationsApi().then((r) => r.data.data),
   });
 
-  const registeredIds = new Set((regsData?.registrations || []).map((r) => r.event?._id));
+  const registeredIds = new Set((regsData?.registrations || []).map((r) => r.event?._id || r.event));
 
   const registerMutation = useMutation({
     mutationFn: async (event) => {
       if (event.fee > 0) {
+        // Paid event — open Razorpay checkout
         const { data } = await createPaymentOrderApi(event._id);
         const { orderId, amount, key, registrationId } = data.data;
-        return new Promise((resolve, reject) => {
-          const rzp = new window.Razorpay({
-            key, amount, currency: 'INR', order_id: orderId, name: 'EventFlex',
-            description: event.title,
-            handler: async (response) => {
-              try {
-                await verifyPaymentApi({ orderId: response.razorpay_order_id, paymentId: response.razorpay_payment_id, signature: response.razorpay_signature, registrationId });
-                resolve();
-              } catch (e) { reject(e); }
-            },
-            theme: { color: '#6366f1' },
-          });
-          rzp.open();
+        const response = await openRazorpay({
+          key,
+          amount,
+          currency: 'INR',
+          order_id: orderId,
+          name: 'EventFlex',
+          description: event.title,
+          prefill: {},
+          theme: { color: '#6366f1' },
         });
+        await verifyPaymentApi({
+          orderId: response.razorpay_order_id,
+          paymentId: response.razorpay_payment_id,
+          signature: response.razorpay_signature,
+          registrationId,
+        });
+        return;
       }
+      // Free event — direct registration
       return registerForEventApi(event._id);
     },
     onSuccess: () => {
       toast.success('Registered successfully!');
-      qc.invalidateQueries(['my-registrations']);
+      qc.invalidateQueries({ queryKey: ['my-registrations'] });
+      qc.invalidateQueries({ queryKey: ['events'] });
     },
-    onError: (err) => toast.error(err.response?.data?.message || 'Registration failed'),
+    onError: (err) => {
+      const msg = err.response?.data?.message || err.message || 'Registration failed';
+      toast.error(msg);
+    },
   });
 
   return (
     <div className="space-y-5">
       <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Browse Events</h2>
       <div className="flex flex-col sm:flex-row gap-3">
-        <div className="flex-1"><SearchBar value={search} onChange={(v) => { setSearch(v); setPage(1); }} placeholder="Search events..." /></div>
+        <div className="flex-1">
+          <SearchBar value={search} onChange={(v) => { setSearch(v); setPage(1); }} placeholder="Search events..." />
+        </div>
         <select value={category} onChange={(e) => { setCategory(e.target.value); setPage(1); }}
           className="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
           <option value="">All Categories</option>
@@ -78,13 +96,19 @@ export default function EventBrowse() {
       ) : (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {data.events.map((event) => (
-              <EventCard key={event._id} event={event} role="student"
+            {(data?.events || []).map((event) => (
+              <EventCard
+                key={event._id}
+                event={event}
+                role="student"
                 isRegistered={registeredIds.has(event._id)}
-                onRegister={(e) => registerMutation.mutate(e)} />
+                onRegister={(e) => registerMutation.mutate(e)}
+              />
             ))}
           </div>
-          <Pagination page={data.meta.page} pages={data.meta.pages} onChange={setPage} />
+          {data?.meta && (
+            <Pagination page={data.meta.page} pages={data.meta.pages} onChange={setPage} />
+          )}
         </>
       )}
     </div>

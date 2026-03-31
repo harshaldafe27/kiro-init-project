@@ -14,8 +14,7 @@ const register = async (req, res) => {
             eventId
         } = req.body;
         const event = await Events.findById(eventId);
-        if (!event || !event.isPublished || event.isCancelled) return errorResponse(res, 'Event not available', 404);
-        if (new Date(event.date) <= new Date()) return errorResponse(res, 'Registration deadline passed', 400);
+        if (!event || event.isCancelled) return errorResponse(res, 'Event not available', 404);
         if (event.registeredCount >= event.capacity) return errorResponse(res, 'Event is full', 400);
         const dup = await Registrations.findDuplicate(req.user._id, eventId);
         if (dup && dup.status !== 'cancelled') return errorResponse(res, 'Already registered', 409);

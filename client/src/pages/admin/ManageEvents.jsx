@@ -22,13 +22,13 @@ export default function ManageEvents() {
 
   const deleteMutation = useMutation({
     mutationFn: deleteEventApi,
-    onSuccess: () => { toast.success('Event deleted'); qc.invalidateQueries(['admin-events']); },
+    onSuccess: () => { toast.success('Event deleted'); qc.invalidateQueries({ queryKey: ['admin-events'] }); qc.invalidateQueries({ queryKey: ['events'] }); },
     onError: (err) => toast.error(err.response?.data?.message || 'Delete failed'),
   });
 
   const publishMutation = useMutation({
     mutationFn: togglePublishApi,
-    onSuccess: () => { toast.success('Publish status updated'); qc.invalidateQueries(['admin-events']); },
+    onSuccess: () => { toast.success('Publish status updated'); qc.invalidateQueries({ queryKey: ['admin-events'] }); qc.invalidateQueries({ queryKey: ['events'] }); },
   });
 
   const handleEdit = (event) => { setEditEvent(event); setShowForm(true); };

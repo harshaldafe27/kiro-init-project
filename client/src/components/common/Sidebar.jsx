@@ -1,5 +1,7 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { signOut } from 'firebase/auth';
+import { auth } from '../../config/firebase';
 import useStore from '../../store/useStore';
 
 const navItems = {
@@ -25,7 +27,15 @@ export default function Sidebar({ role }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const clearAuth = useStore((s) => s.clearAuth);
+  const navigate = useNavigate();
   const items = navItems[role] || [];
+
+  const handleLogout = async () => {
+    try { await signOut(auth); } catch (_) {}
+    clearAuth();
+    window.__accessToken__ = null;
+    navigate('/login');
+  };
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
@@ -48,7 +58,7 @@ export default function Sidebar({ role }) {
         ))}
       </nav>
       <div className="px-3 py-4 border-t border-gray-100 dark:border-gray-800">
-        <button onClick={clearAuth}
+        <button onClick={handleLogout}
           className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
           <span>🚪</span>{!collapsed && <span>Logout</span>}
         </button>

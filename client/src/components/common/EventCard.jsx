@@ -1,8 +1,8 @@
 import { formatDate } from '../../utils/formatDate';
 
 export default function EventCard({ event, onRegister, onEdit, onDelete, role, isRegistered }) {
-  const isPast = new Date(event.date) < new Date();
-  const isFull = event.registeredCount >= event.capacity;
+  const isPast = event.deadline ? new Date(event.deadline) < new Date() : new Date(event.date) < new Date();
+  const isFull = event.capacity > 0 && event.registeredCount >= event.capacity;
 
   return (
     <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden hover:shadow-md transition-shadow">

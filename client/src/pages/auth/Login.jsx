@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../config/firebase';
 import AuthLayout from '../../layouts/AuthLayout';
 import { loginApi } from '../../api/auth.api';
 import useStore from '../../store/useStore';
@@ -21,6 +23,10 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
+      // Step 1: Firebase Authentication
+      await signInWithEmailAndPassword(auth, form.email, form.password);
+
+      // Step 2: Get role + JWT from our backend
       const { data } = await loginApi(form);
       const { user, accessToken } = data.data;
       window.__accessToken__ = accessToken;
@@ -28,7 +34,16 @@ export default function Login() {
       toast.success(`Welcome back, ${user.name}! ${roleIcon[user.role] || ''}`);
       navigate(roleHome[user.role] || '/student');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      const code = err.code;
+      if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
+        setError('Email or password is incorrect');
+      } else if (code === 'auth/invalid-email') {
+        setError('Please enter a valid email address');
+      } else if (code === 'auth/too-many-requests') {
+        setError('Too many attempts. Please try again later');
+      } else {
+        setError(err.response?.data?.message || 'Login failed');
+      }
     } finally {
       setLoading(false);
     }
@@ -58,7 +73,6 @@ export default function Login() {
         </button>
       </form>
 
-      {/* Role hint cards */}
       <div className="mt-5 grid grid-cols-3 gap-2">
         {[
           { role: 'Student', icon: '🎓', color: 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' },
