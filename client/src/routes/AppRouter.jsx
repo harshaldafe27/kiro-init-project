@@ -8,6 +8,7 @@ import Register from '../pages/auth/Register';
 
 import StudentDashboard from '../pages/student/StudentDashboard';
 import EventBrowse from '../pages/student/EventBrowse';
+import EventDetailPage from '../pages/student/EventDetailPage';
 import MyRegistrations from '../pages/student/MyRegistrations';
 import Profile from '../pages/student/Profile';
 
@@ -29,6 +30,7 @@ export default function AppRouter() {
       <Route path="/student" element={<ProtectedRoute><RoleRoute role="student"><DashboardLayout title="Student Dashboard" /></RoleRoute></ProtectedRoute>}>
         <Route index element={<StudentDashboard />} />
         <Route path="events" element={<EventBrowse />} />
+        <Route path="events/:id" element={<EventDetailPage />} />
         <Route path="registrations" element={<MyRegistrations />} />
         <Route path="profile" element={<Profile />} />
       </Route>

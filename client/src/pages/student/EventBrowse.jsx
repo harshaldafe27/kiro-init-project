@@ -1,80 +1,24 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { getEventsApi } from '../../api/event.api';
-import { registerForEventApi, createPaymentOrderApi, verifyPaymentApi, getMyRegistrationsApi } from '../../api/registration.api';
 import EventCard from '../../components/common/EventCard';
 import SearchBar from '../../components/common/SearchBar';
 import Pagination from '../../components/common/Pagination';
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
 import ErrorState from '../../components/common/ErrorState';
-import { useToast } from '../../hooks/useToast';
 import { usePagination } from '../../hooks/usePagination';
 
 const CATEGORIES = ['Technical', 'Cultural', 'Sports', 'Academic', 'Workshop'];
-
-const openRazorpay = (options) =>
-  new Promise((resolve, reject) => {
-    const rzp = new window.Razorpay({ ...options, handler: resolve });
-    rzp.on('payment.failed', reject);
-    rzp.open();
-  });
 
 export default function EventBrowse() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
   const { page, limit, setPage } = usePagination(9);
-  const toast = useToast();
-  const qc = useQueryClient();
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['events', { search, category, page, limit }],
     queryFn: () => getEventsApi({ search, category, page, limit }).then((r) => r.data.data),
-  });
-
-  const { data: regsData } = useQuery({
-    queryKey: ['my-registrations'],
-    queryFn: () => getMyRegistrationsApi().then((r) => r.data.data),
-  });
-
-  const registeredIds = new Set((regsData?.registrations || []).map((r) => r.event?._id || r.event));
-
-  const registerMutation = useMutation({
-    mutationFn: async (event) => {
-      if (event.fee > 0) {
-        // Paid event — open Razorpay checkout
-        const { data } = await createPaymentOrderApi(event._id);
-        const { orderId, amount, key, registrationId } = data.data;
-        const response = await openRazorpay({
-          key,
-          amount,
-          currency: 'INR',
-          order_id: orderId,
-          name: 'EventFlex',
-          description: event.title,
-          prefill: {},
-          theme: { color: '#6366f1' },
-        });
-        await verifyPaymentApi({
-          orderId: response.razorpay_order_id,
-          paymentId: response.razorpay_payment_id,
-          signature: response.razorpay_signature,
-          registrationId,
-        });
-        return;
-      }
-      // Free event — direct registration
-      return registerForEventApi(event._id);
-    },
-    onSuccess: () => {
-      toast.success('Registered successfully!');
-      qc.invalidateQueries({ queryKey: ['my-registrations'] });
-      qc.invalidateQueries({ queryKey: ['events'] });
-    },
-    onError: (err) => {
-      const msg = err.response?.data?.message || err.message || 'Registration failed';
-      toast.error(msg);
-    },
   });
 
   return (
@@ -101,8 +45,6 @@ export default function EventBrowse() {
                 key={event._id}
                 event={event}
                 role="student"
-                isRegistered={registeredIds.has(event._id)}
-                onRegister={(e) => registerMutation.mutate(e)}
               />
             ))}
           </div>

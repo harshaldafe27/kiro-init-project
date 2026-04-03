@@ -1,5 +1,26 @@
 const mongoose = require('mongoose');
 
+const teamMemberSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    btId: {
+        type: String,
+        required: true
+    },
+    branch: {
+        type: String,
+        required: true
+    },
+    year: {
+        type: String,
+        required: true
+    },
+}, {
+    _id: false
+});
+
 const registrationSchema = new mongoose.Schema({
     student: {
         type: mongoose.Schema.Types.ObjectId,
@@ -10,6 +31,35 @@ const registrationSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Event',
         required: true
+    },
+    // Unique ticket ID generated on confirmation
+    specialId: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
+    // Participant details collected at registration
+    participantDetails: {
+        name: {
+            type: String
+        },
+        btId: {
+            type: String
+        },
+        branch: {
+            type: String
+        },
+        year: {
+            type: String
+        },
+    },
+    // Team fields (optional — only for team events)
+    teamName: {
+        type: String
+    },
+    teamMembers: {
+        type: [teamMemberSchema],
+        default: []
     },
     status: {
         type: String,

@@ -1,6 +1,8 @@
+import { useNavigate } from 'react-router-dom';
 import { formatDate } from '../../utils/formatDate';
 
-export default function EventCard({ event, onRegister, onEdit, onDelete, role, isRegistered }) {
+export default function EventCard({ event, onEdit, onDelete, role }) {
+  const navigate = useNavigate();
   const isPast = event.deadline ? new Date(event.deadline) < new Date() : new Date(event.date) < new Date();
   const isFull = event.capacity > 0 && event.registeredCount >= event.capacity;
 
@@ -33,14 +35,14 @@ export default function EventCard({ event, onRegister, onEdit, onDelete, role, i
         </div>
 
         {role === 'student' && (
-          <button onClick={() => onRegister(event)} disabled={isPast || isFull || isRegistered}
-            className={`mt-4 w-full py-2 rounded-xl text-sm font-medium transition-colors ${
-              isRegistered ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 cursor-default'
-              : isPast || isFull ? 'bg-gray-100 text-gray-400 dark:bg-gray-800 cursor-not-allowed'
-              : 'bg-indigo-600 hover:bg-indigo-700 text-white'
-            }`}>
-            {isRegistered ? '✓ Registered' : isPast ? 'Deadline Passed' : isFull ? 'Full' : 'Register'}
-          </button>
+          <div className="mt-4">
+            <button
+              onClick={() => navigate(`/student/events/${event._id}`)}
+              className="w-full py-2 rounded-xl text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white transition-colors"
+            >
+              View Details
+            </button>
+          </div>
         )}
 
         {role === 'admin' && (

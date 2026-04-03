@@ -123,33 +123,36 @@ This document provides ASCII-based wireframes for all major screens in the Event
 │ [EventFlex Logo]  Student Dashboard          🔔 [3]  👤 John  ☀️/🌙        │
 ├──────────────┬──────────────────────────────────────────────────────────────┤
 │              │                                                              │
-│  📊 Dashboard│  Welcome back, John!                                         │
-│  🎫 Events   │                                                              │
-│  📝 My Reg.  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  👤 Profile  │  │ Upcoming     │  │ Registered   │  │ Available    │      │
-│              │  │ Events       │  │ Events       │  │ Events       │      │
-│  ─────────   │  │              │  │              │  │              │      │
-│              │  │     12       │  │      5       │  │     25       │      │
+│  📊 Dashboard│  Welcome back, John! 👋                                      │
+│  🎫 Events   │  Here's what's happening on campus                           │
+│  📝 My Reg.  │                                                              │
+│  👤 Profile  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│              │  │ 🎉           │  │ 📋           │  │ 📅           │      │
+│  ─────────   │  │ Active Events│  │ My Reg.      │  │ Upcoming     │      │
+│              │  │     25       │  │      5       │  │     12       │      │
 │  [Collapse]  │  └──────────────┘  └──────────────┘  └──────────────┘      │
 │              │                                                              │
-│              │  My Upcoming Events                                          │
-│              │  ┌────────────────────────────────────────────────────────┐  │
-│              │  │ 🎭 Tech Fest 2026                    📅 Apr 15, 2026  │  │
-│              │  │ Annual technology festival            📍 Main Auditorium│  │
-│              │  │ Status: Confirmed  Payment: Paid      [View Details]   │  │
-│              │  └────────────────────────────────────────────────────────┘  │
+│              │  Recent Events                                  [View all →] │
 │              │                                                              │
-│              │  ┌────────────────────────────────────────────────────────┐  │
-│              │  │ 🎨 Art Exhibition                    📅 Apr 20, 2026  │  │
-│              │  │ Student artwork showcase              📍 Gallery Hall  │  │
-│              │  │ Status: Pending    Payment: Free      [View Details]   │  │
-│              │  └────────────────────────────────────────────────────────┘  │
-│              │                                                              │
-│              │  Quick Actions                                               │
-│              │  [Browse Events]  [My Registrations]  [Update Profile]      │
+│              │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│              │  │ [Banner Img] │  │ [Banner Img] │  │ [Banner Img] │      │
+│              │  │              │  │              │  │              │      │
+│              │  │ Tech Fest    │  │ Music Night  │  │ Hackathon    │      │
+│              │  │ 2026         │  │              │  │ 2026         │      │
+│              │  │              │  │              │  │              │      │
+│              │  │ 📅 Apr 15    │  │ 📅 Apr 18    │  │ 📅 Apr 22    │      │
+│              │  │ 📍 Auditorium│  │ 📍 Open Air  │  │ 📍 Lab Block │      │
+│              │  │ 💰 ₹500      │  │ 💰 Free      │  │ 💰 ₹200      │      │
+│              │  │ 👥 50/100    │  │ 👥 200/500   │  │ 👥 30/50     │      │
+│              │  │              │  │              │  │              │      │
+│              │  │[View Details]│  │[View Details]│  │[View Details]│      │
+│              │  │ [Register]   │  │ [Register]   │  │ [Register]   │      │
+│              │  └──────────────┘  └──────────────┘  └──────────────┘      │
 │              │                                                              │
 └──────────────┴──────────────────────────────────────────────────────────────┘
 ```
+
+Note: "View Details" navigates to `/student/events/:id` — a full dedicated event detail page.
 
 
 ### 2.2 Event Browse Page
@@ -201,7 +204,66 @@ This document provides ASCII-based wireframes for all major screens in the Event
 ```
 
 
-### 2.3 Event Detail Modal
+### 2.3 Event Detail Modal (legacy — replaced by full page)
+
+> Deprecated in favour of the dedicated Event Detail Page (2.3b). Kept for reference only.
+
+### 2.3b Event Detail Page (Unstop-style, `/student/events/:id`)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ [EventFlex Logo]  Tech Fest 2026              🔔 [3]  👤 John  ☀️/🌙        │
+├──────────────┬──────────────────────────────────────────────────────────────┤
+│              │                                                              │
+│  📊 Dashboard│  ← Back                                                      │
+│  🎫 Events   │                                                              │
+│  📝 My Reg.  │  ┌────────────────────────────────────────────────────────┐  │
+│  👤 Profile  │  │                                                        │  │
+│              │  │              [Event Banner Image]                      │  │
+│  ─────────   │  │                                                        │  │
+│              │  │  [Technology]                                          │  │
+│  [Collapse]  │  │  Tech Fest 2026                                        │  │
+│              │  └────────────────────────────────────────────────────────┘  │
+│              │                                                              │
+│              │  ┌──────────────────────────────────┐  ┌─────────────────┐  │
+│              │  │                                  │  │                 │  │
+│              │  │  #tech  #workshop  #AI  #cloud   │  │  ₹500           │  │
+│              │  │                                  │  │  ✓ Registered   │  │
+│              │  │  About this Event                │  │                 │  │
+│              │  │  ┌──────────────────────────┐    │  │ ████████░░ 80%  │  │
+│              │  │  │ Join us for the annual   │    │  │ 80/100 · 20 left│  │
+│              │  │  │ Tech Fest featuring      │    │  │                 │  │
+│              │  │  │ workshops, competitions, │    │  │ [Register Now   │  │
+│              │  │  │ and exhibitions. Learn   │    │  │  — ₹500]        │  │
+│              │  │  │ from industry experts    │    │  │                 │  │
+│              │  │  │ and showcase your        │    │  │ ─────────────── │  │
+│              │  │  │ technical skills.        │    │  │ 📅 Apr 15, 2026 │  │
+│              │  │  │ Prizes worth ₹50,000!    │    │  │ 📍 Auditorium   │  │
+│              │  │  └──────────────────────────┘    │  │                 │  │
+│              │  │                                  │  └─────────────────┘  │
+│              │  │  Event Details                   │                       │
+│              │  │  ┌──────────────────────────┐    │                       │
+│              │  │  │ 📅 Start  Apr 15, 2026   │    │                       │
+│              │  │  │ 🏁 End    Apr 15, 2026   │    │                       │
+│              │  │  │ 📍 Venue  Main Auditorium │    │                       │
+│              │  │  │ 👥 Cap.   80 / 100        │    │                       │
+│              │  │  │ 💰 Fee    ₹500            │    │                       │
+│              │  │  │ 🧑‍💼 By    Admin Name      │    │                       │
+│              │  │  └──────────────────────────┘    │                       │
+│              │  │                                  │                       │
+│              │  └──────────────────────────────────┘                       │
+│              │                                                              │
+└──────────────┴──────────────────────────────────────────────────────────────┘
+```
+
+Key elements:
+- Full-width hero banner with gradient overlay and title
+- Category badge + tags row
+- Two-column layout: left = About + Event Details, right = sticky registration card
+- Registration card: price, capacity progress bar (color-coded: green→amber→red), CTA button
+- Button states: "Register Now — ₹500" / "Register for Free" / "✓ Already Registered" / "Registration Closed" / "Event Full"
+- "← Back" navigates to previous page
+- Route: `/student/events/:id`
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -248,7 +310,157 @@ This document provides ASCII-based wireframes for all major screens in the Event
 ```
 
 
-### 2.4 My Registrations Page
+### 2.4 Registration Flow — Multi-Step Modal
+
+Triggered when student clicks "Register Now" on the Event Detail Page.
+
+#### Step 1 — Participant Details
+
+```
+┌───────────────────────────────────────────────────────────┐
+│  Registering for: Tech Fest 2026                    [✕]  │
+│  ─────────────────────────────────────────────────────── │
+│  [1. Your Details]  [2. Team]  [3. Confirm & Pay]        │
+│  ─────────────────────────────────────────────────────── │
+│                                                           │
+│  Fill in your details as the primary participant.         │
+│                                                           │
+│  Full Name *                                              │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │ John Doe                                          │   │
+│  └───────────────────────────────────────────────────┘   │
+│                                                           │
+│  BT ID *                                                  │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │ BT22CSE001                                        │   │
+│  └───────────────────────────────────────────────────┘   │
+│                                                           │
+│  Branch *                    Year *                       │
+│  ┌──────────────────────┐   ┌──────────────────────┐     │
+│  │ CSE                  │   │ 2nd Year ▼            │     │
+│  └──────────────────────┘   └──────────────────────┘     │
+│                                                           │
+│                                          [Next →]         │
+└───────────────────────────────────────────────────────────┘
+```
+
+#### Step 2 — Team (Unstop-style)
+
+```
+┌───────────────────────────────────────────────────────────┐
+│  Registering for: Tech Fest 2026                    [✕]  │
+│  ─────────────────────────────────────────────────────── │
+│  [✓ Your Details]  [2. Team]  [3. Confirm & Pay]         │
+│  ─────────────────────────────────────────────────────── │
+│                                                           │
+│  Is this a team participation?                            │
+│  ┌──────────────────┐  ┌──────────────────┐              │
+│  │      Solo        │  │  ● Team          │              │
+│  └──────────────────┘  └──────────────────┘              │
+│                                                           │
+│  Team Name *                                              │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │ Team Innovators                                   │   │
+│  └───────────────────────────────────────────────────┘   │
+│                                                           │
+│  TEAM MEMBERS                                             │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │ Member 1                                          │   │
+│  │ Name: Jane Doe   BT ID: BT22CSE002                │   │
+│  │ Branch: ECE      Year: 2nd Year ▼                 │   │
+│  └───────────────────────────────────────────────────┘   │
+│                                                           │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │ Member 2                              [Remove]    │   │
+│  │ Name: ________   BT ID: __________                │   │
+│  │ Branch: ______   Year: __________ ▼               │   │
+│  └───────────────────────────────────────────────────┘   │
+│                                                           │
+│  [+ Add Member]                                           │
+│                                                           │
+│  [← Back]                                [Next →]         │
+└───────────────────────────────────────────────────────────┘
+```
+
+#### Step 3 — Terms & Confirm / Pay
+
+```
+┌───────────────────────────────────────────────────────────┐
+│  Registering for: Tech Fest 2026                    [✕]  │
+│  ─────────────────────────────────────────────────────── │
+│  [✓ Your Details]  [✓ Team]  [3. Confirm & Pay]          │
+│  ─────────────────────────────────────────────────────── │
+│                                                           │
+│  Registration Summary                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │ Event       Tech Fest 2026                        │   │
+│  │ Participant John Doe                              │   │
+│  │ BT ID       BT22CSE001                            │   │
+│  │ Branch/Year CSE · 2nd Year                        │   │
+│  │ Team        Team Innovators (3 members)           │   │
+│  │ ─────────────────────────────────────────────     │   │
+│  │ Amount      ₹500                                  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                                                           │
+│  ⚠ Terms & Conditions                                     │
+│  • Registration is non-refundable once confirmed.         │
+│  • You must carry this ticket to the event.               │
+│  • Organizer may cancel or reschedule the event.          │
+│  • Participants must follow the code of conduct.          │
+│                                                           │
+│  [✓] I have read and agree to the Terms & Conditions      │
+│                                                           │
+│  [← Back]                          [Pay ₹500 →]           │
+└───────────────────────────────────────────────────────────┘
+```
+
+### 2.5 Digital Ticket (auto-renders after successful registration/payment)
+
+```
+┌───────────────────────────────────────────────────────────┐
+│                                                           │
+│  ┌─────────────────────────────────────────────────────┐  │
+│  │                                                     │  │
+│  │  EventFlex                          ┌──────────┐   │  │
+│  │  Tech Fest 2026                     │  ✓ PAID  │   │  │
+│  │                                     └──────────┘   │  │
+│  │  ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │  │
+│  │                                                     │  │
+│  │  ATTENDEE          SPECIAL ID                       │  │
+│  │  John Doe          EF-2026-TECH-A3F9K2              │  │
+│  │                                                     │  │
+│  │  DATE              VENUE                            │  │
+│  │  Apr 15, 2026      Main Auditorium                  │  │
+│  │                                                     │  │
+│  │  AMOUNT PAID       TEAM                             │  │
+│  │  ₹500              Team Innovators                  │  │
+│  │                                                     │  │
+│  │  TEAM MEMBERS                                       │  │
+│  │  Jane Doe · BT22CSE002 · ECE, 2nd Year              │  │
+│  │  Mike Lee · BT22CSE003 · CSE, 3rd Year              │  │
+│  │                                                     │  │
+│  │  ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │  │
+│  │                                                     │  │
+│  │  ┌──────────┐   Scan at entry                       │  │
+│  │  │  [QR]    │   EF-2026-TECH-A3F9K2                 │  │
+│  │  │          │   eventflex.app                       │  │
+│  │  └──────────┘                                       │  │
+│  │                                                     │  │
+│  └─────────────────────────────────────────────────────┘  │
+│                                                           │
+│  [⬇ Download Image]  [⬇ Download PDF]  [✕ Close]         │
+│                                                           │
+└───────────────────────────────────────────────────────────┘
+```
+
+Ticket fields:
+- Event Name, Student Name, Special ID (format: `EF-YYYY-EVNT-XXXXXX`)
+- Date, Venue, Amount Paid / Free
+- Team Name + Team Members (if team registration)
+- SVG QR code placeholder (deterministic pattern from specialId)
+- Download as PNG image or PDF
+
+### 2.6 My Registrations Page
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
