@@ -14,6 +14,7 @@ import Profile from '../pages/student/Profile';
 
 import AdminDashboard from '../pages/admin/AdminDashboard';
 import ManageEvents from '../pages/admin/ManageEvents';
+import CreateEventPage from '../pages/admin/CreateEventPage';
 import EventRegistrants from '../pages/admin/EventRegistrants';
 
 import PrincipalDashboard from '../pages/principal/PrincipalDashboard';
@@ -39,6 +40,8 @@ export default function AppRouter() {
       <Route path="/admin" element={<ProtectedRoute><RoleRoute role="admin"><DashboardLayout title="Admin Dashboard" /></RoleRoute></ProtectedRoute>}>
         <Route index element={<AdminDashboard />} />
         <Route path="events" element={<ManageEvents />} />
+        <Route path="events/create" element={<CreateEventPage />} />
+        <Route path="events/:id/edit" element={<CreateEventPage />} />
         <Route path="events/:id/registrants" element={<EventRegistrants />} />
         <Route path="profile" element={<Profile />} />
       </Route>

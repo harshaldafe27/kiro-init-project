@@ -161,10 +161,24 @@ export default function EventDetailPage() {
           )}
 
           <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">About this Event</h2>
-            <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed whitespace-pre-line">
-              {event.description || 'No description provided.'}
-            </p>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">About this Event</h2>
+            {event.description ? (
+              <div
+                className="prose prose-sm dark:prose-invert max-w-none
+                  prose-p:text-gray-600 dark:prose-p:text-gray-300 prose-p:leading-7 prose-p:my-3
+                  prose-h1:text-gray-900 dark:prose-h1:text-white prose-h1:text-xl prose-h1:font-bold prose-h1:mt-6 prose-h1:mb-3
+                  prose-h2:text-gray-900 dark:prose-h2:text-white prose-h2:text-lg prose-h2:font-semibold prose-h2:mt-5 prose-h2:mb-2
+                  prose-h3:text-gray-800 dark:prose-h3:text-gray-100 prose-h3:text-base prose-h3:font-semibold prose-h3:mt-4 prose-h3:mb-2
+                  prose-ul:my-3 prose-ul:space-y-1.5 prose-li:text-gray-600 dark:prose-li:text-gray-300 prose-li:leading-6
+                  prose-ol:my-3 prose-ol:space-y-1.5
+                  prose-strong:text-gray-800 dark:prose-strong:text-gray-100 prose-strong:font-semibold
+                  prose-a:text-indigo-600 dark:prose-a:text-indigo-400 prose-a:no-underline hover:prose-a:underline
+                  prose-hr:my-4 prose-hr:border-gray-200 dark:prose-hr:border-gray-700"
+                dangerouslySetInnerHTML={{ __html: event.description }}
+              />
+            ) : (
+              <p className="text-gray-400 text-sm">No description provided.</p>
+            )}
           </div>
 
           <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800">
