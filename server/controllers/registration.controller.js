@@ -7,11 +7,17 @@ const {
     successResponse,
     errorResponse
 } = require('../utils/apiResponse');
+const {
+    generateSpecialId
+} = require('../utils/generateSpecialId');
 
 const register = async (req, res) => {
     try {
         const {
-            eventId
+            eventId,
+            participantDetails,
+            teamName,
+            teamMembers
         } = req.body;
         const event = await Events.findById(eventId);
         if (!event || event.isCancelled) return errorResponse(res, 'Event not available', 404);
@@ -19,29 +25,59 @@ const register = async (req, res) => {
         const dup = await Registrations.findDuplicate(req.user._id, eventId);
         if (dup && dup.status !== 'cancelled') return errorResponse(res, 'Already registered', 409);
 
+        const regData = {
+            student: req.user._id,
+            event: eventId,
+            participantDetails: participantDetails || {},
+            teamName: teamName || '',
+            teamMembers: teamMembers || [],
+        };
+
         if (event.fee > 0) {
-            const reg = await Registrations.create({
-                student: req.user._id,
-                event: eventId,
-                status: 'pending',
-                paymentStatus: 'pending',
-                amount: event.fee
-            });
+            // For paid events, create/reuse a pending registration
+            let reg;
+            if (dup && dup.status === 'cancelled') {
+                reg = await Registrations.update(dup._id, {
+                    ...regData,
+                    status: 'pending',
+                    paymentStatus: 'pending',
+                    amount: event.fee,
+                    specialId: null,
+                });
+            } else {
+                reg = await Registrations.create({
+                    ...regData,
+                    status: 'pending',
+                    paymentStatus: 'pending',
+                    amount: event.fee,
+                });
+            }
             return successResponse(res, {
                 registration: reg,
                 requiresPayment: true
             }, 'Registration initiated', 201);
         }
 
-        const reg = await Registrations.create({
-            student: req.user._id,
-            event: eventId,
-            status: 'confirmed',
-            paymentStatus: 'not_required'
-        });
+        const specialId = generateSpecialId(event.title);
+        let reg;
+        if (dup && dup.status === 'cancelled') {
+            reg = await Registrations.update(dup._id, {
+                ...regData,
+                status: 'confirmed',
+                paymentStatus: 'not_required',
+                specialId,
+                amount: 0,
+            });
+        } else {
+            reg = await Registrations.create({
+                ...regData,
+                status: 'confirmed',
+                paymentStatus: 'not_required',
+                specialId,
+            });
+        }
         await Events.incrementCount(eventId, 1);
 
-        // Email (non-blocking)
         try {
             const {
                 sendRegistrationConfirmation
@@ -50,7 +86,6 @@ const register = async (req, res) => {
             await sendRegistrationConfirmation(user, event);
         } catch (_) {}
 
-        // Socket
         try {
             const {
                 getIO
@@ -77,7 +112,11 @@ const getMyRegistrations = async (req, res) => {
             const event = await Events.findById(r.event);
             return {
                 ...r,
-                event
+                event,
+                specialId: r.specialId || null,
+                participantDetails: r.participantDetails || {},
+                teamName: r.teamName || '',
+                teamMembers: r.teamMembers || [],
             };
         }));
         return successResponse(res, {
@@ -120,8 +159,14 @@ const getEventRegistrations = async (req, res) => {
                     _id: student._id,
                     name: student.name,
                     email: student.email,
-                    college: student.college
-                } : null
+                    college: student.college,
+                    phone: student.phone,
+                } : null,
+                // Ticket & participant data visible to admin
+                specialId: r.specialId || null,
+                participantDetails: r.participantDetails || {},
+                teamName: r.teamName || '',
+                teamMembers: r.teamMembers || [],
             };
         }));
         return successResponse(res, {

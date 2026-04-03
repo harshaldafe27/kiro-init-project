@@ -8,11 +8,13 @@ import Register from '../pages/auth/Register';
 
 import StudentDashboard from '../pages/student/StudentDashboard';
 import EventBrowse from '../pages/student/EventBrowse';
+import EventDetailPage from '../pages/student/EventDetailPage';
 import MyRegistrations from '../pages/student/MyRegistrations';
 import Profile from '../pages/student/Profile';
 
 import AdminDashboard from '../pages/admin/AdminDashboard';
 import ManageEvents from '../pages/admin/ManageEvents';
+import CreateEventPage from '../pages/admin/CreateEventPage';
 import EventRegistrants from '../pages/admin/EventRegistrants';
 
 import PrincipalDashboard from '../pages/principal/PrincipalDashboard';
@@ -29,6 +31,7 @@ export default function AppRouter() {
       <Route path="/student" element={<ProtectedRoute><RoleRoute role="student"><DashboardLayout title="Student Dashboard" /></RoleRoute></ProtectedRoute>}>
         <Route index element={<StudentDashboard />} />
         <Route path="events" element={<EventBrowse />} />
+        <Route path="events/:id" element={<EventDetailPage />} />
         <Route path="registrations" element={<MyRegistrations />} />
         <Route path="profile" element={<Profile />} />
       </Route>
@@ -37,6 +40,8 @@ export default function AppRouter() {
       <Route path="/admin" element={<ProtectedRoute><RoleRoute role="admin"><DashboardLayout title="Admin Dashboard" /></RoleRoute></ProtectedRoute>}>
         <Route index element={<AdminDashboard />} />
         <Route path="events" element={<ManageEvents />} />
+        <Route path="events/create" element={<CreateEventPage />} />
+        <Route path="events/:id/edit" element={<CreateEventPage />} />
         <Route path="events/:id/registrants" element={<EventRegistrants />} />
         <Route path="profile" element={<Profile />} />
       </Route>

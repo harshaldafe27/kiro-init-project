@@ -11,11 +11,17 @@ const {
 const {
     RAZORPAY_KEY_ID
 } = require('../config/env');
+const {
+    generateSpecialId
+} = require('../utils/generateSpecialId');
 
 const createOrder = async (req, res) => {
     try {
         const {
-            eventId
+            eventId,
+            participantDetails,
+            teamName,
+            teamMembers
         } = req.body;
         const event = await Events.findById(eventId);
         if (!event || event.isCancelled) return errorResponse(res, 'Event not available', 404);
@@ -25,15 +31,33 @@ const createOrder = async (req, res) => {
         const existing = await Registrations.findDuplicate(req.user._id, eventId);
         if (existing && existing.status !== 'cancelled') return errorResponse(res, 'Already registered', 409);
 
-        let registration = existing;
+        let registration = existing && existing.status === 'cancelled' ? null : existing;
         if (!registration) {
-            registration = await Registrations.create({
-                student: req.user._id,
-                event: eventId,
-                status: 'pending',
-                paymentStatus: 'pending',
-                amount: event.fee
-            });
+            if (existing && existing.status === 'cancelled') {
+                // Reuse the cancelled doc
+                registration = await Registrations.update(existing._id, {
+                    status: 'pending',
+                    paymentStatus: 'pending',
+                    amount: event.fee,
+                    participantDetails: participantDetails || {},
+                    teamName: teamName || '',
+                    teamMembers: teamMembers || [],
+                    specialId: null,
+                    paymentId: null,
+                    orderId: null,
+                });
+            } else {
+                registration = await Registrations.create({
+                    student: req.user._id,
+                    event: eventId,
+                    status: 'pending',
+                    paymentStatus: 'pending',
+                    amount: event.fee,
+                    participantDetails: participantDetails || {},
+                    teamName: teamName || '',
+                    teamMembers: teamMembers || [],
+                });
+            }
         }
 
         const receipt = ('rcpt_' + registration._id).slice(0, 40);
@@ -90,14 +114,18 @@ const verifyPayment = async (req, res) => {
         if (!reg) return errorResponse(res, 'Registration not found', 404);
         if (reg.student !== req.user._id) return errorResponse(res, 'Forbidden', 403);
 
+        // Fetch event BEFORE using it in generateSpecialId
+        const event = await Events.findById(reg.event);
+
+        const specialId = generateSpecialId(event ? event.title : '');
         const updated = await Registrations.update(registrationId, {
             paymentStatus: 'paid',
             status: 'confirmed',
             paymentId,
-            orderId
+            orderId,
+            specialId,
         });
         await Events.incrementCount(reg.event, 1);
-        const event = await Events.findById(reg.event);
 
         try {
             const {
@@ -118,7 +146,10 @@ const verifyPayment = async (req, res) => {
         } catch (_) {}
 
         return successResponse(res, {
-            registration: updated,
+            registration: {
+                ...updated,
+                specialId
+            },
             event
         }, 'Payment verified');
     } catch (err) {

@@ -123,33 +123,36 @@ This document provides ASCII-based wireframes for all major screens in the Event
 │ [EventFlex Logo]  Student Dashboard          🔔 [3]  👤 John  ☀️/🌙        │
 ├──────────────┬──────────────────────────────────────────────────────────────┤
 │              │                                                              │
-│  📊 Dashboard│  Welcome back, John!                                         │
-│  🎫 Events   │                                                              │
-│  📝 My Reg.  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  👤 Profile  │  │ Upcoming     │  │ Registered   │  │ Available    │      │
-│              │  │ Events       │  │ Events       │  │ Events       │      │
-│  ─────────   │  │              │  │              │  │              │      │
-│              │  │     12       │  │      5       │  │     25       │      │
+│  📊 Dashboard│  Welcome back, John! 👋                                      │
+│  🎫 Events   │  Here's what's happening on campus                           │
+│  📝 My Reg.  │                                                              │
+│  👤 Profile  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│              │  │ 🎉           │  │ 📋           │  │ 📅           │      │
+│  ─────────   │  │ Active Events│  │ My Reg.      │  │ Upcoming     │      │
+│              │  │     25       │  │      5       │  │     12       │      │
 │  [Collapse]  │  └──────────────┘  └──────────────┘  └──────────────┘      │
 │              │                                                              │
-│              │  My Upcoming Events                                          │
-│              │  ┌────────────────────────────────────────────────────────┐  │
-│              │  │ 🎭 Tech Fest 2026                    📅 Apr 15, 2026  │  │
-│              │  │ Annual technology festival            📍 Main Auditorium│  │
-│              │  │ Status: Confirmed  Payment: Paid      [View Details]   │  │
-│              │  └────────────────────────────────────────────────────────┘  │
+│              │  Recent Events                                  [View all →] │
 │              │                                                              │
-│              │  ┌────────────────────────────────────────────────────────┐  │
-│              │  │ 🎨 Art Exhibition                    📅 Apr 20, 2026  │  │
-│              │  │ Student artwork showcase              📍 Gallery Hall  │  │
-│              │  │ Status: Pending    Payment: Free      [View Details]   │  │
-│              │  └────────────────────────────────────────────────────────┘  │
-│              │                                                              │
-│              │  Quick Actions                                               │
-│              │  [Browse Events]  [My Registrations]  [Update Profile]      │
+│              │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│              │  │ [Banner Img] │  │ [Banner Img] │  │ [Banner Img] │      │
+│              │  │              │  │              │  │              │      │
+│              │  │ Tech Fest    │  │ Music Night  │  │ Hackathon    │      │
+│              │  │ 2026         │  │              │  │ 2026         │      │
+│              │  │              │  │              │  │              │      │
+│              │  │ 📅 Apr 15    │  │ 📅 Apr 18    │  │ 📅 Apr 22    │      │
+│              │  │ 📍 Auditorium│  │ 📍 Open Air  │  │ 📍 Lab Block │      │
+│              │  │ 💰 ₹500      │  │ 💰 Free      │  │ 💰 ₹200      │      │
+│              │  │ 👥 50/100    │  │ 👥 200/500   │  │ 👥 30/50     │      │
+│              │  │              │  │              │  │              │      │
+│              │  │[View Details]│  │[View Details]│  │[View Details]│      │
+│              │  │ [Register]   │  │ [Register]   │  │ [Register]   │      │
+│              │  └──────────────┘  └──────────────┘  └──────────────┘      │
 │              │                                                              │
 └──────────────┴──────────────────────────────────────────────────────────────┘
 ```
+
+Note: "View Details" navigates to `/student/events/:id` — a full dedicated event detail page.
 
 
 ### 2.2 Event Browse Page
@@ -187,8 +190,8 @@ This document provides ASCII-based wireframes for all major screens in the Event
 │              │  │              │  │              │  │              │      │
 │              │  │ Art Workshop │  │ Debate Comp. │  │ Food Fest    │      │
 │              │  │              │  │              │  │              │      │
-│              │  │ 📅 Apr 25    │  │ 📅 Apr 28    │  │ 📅 May 01    │      │
-│              │  │ 📍 Art Room  │  │ 📍 Hall 3    │  │ 📍 Campus    │      │
+│              │  │ 📅 Apr 25    │  │ 📅 Apr 28    │  │ 📅 May 01   │      │
+│              │  │ 📍 Art Room  │  │ 📍 Hall 3    │  │ 📍 Campus   │      │
 │              │  │ 💰 Free      │  │ 💰 ₹100      │  │ 💰 Free      │      │
 │              │  │ 👥 15/30     │  │ 👥 40/60     │  │ 👥 300/500   │      │
 │              │  │              │  │              │  │              │      │
@@ -201,7 +204,66 @@ This document provides ASCII-based wireframes for all major screens in the Event
 ```
 
 
-### 2.3 Event Detail Modal
+### 2.3 Event Detail Modal (legacy — replaced by full page)
+
+> Deprecated in favour of the dedicated Event Detail Page (2.3b). Kept for reference only.
+
+### 2.3b Event Detail Page (Unstop-style, `/student/events/:id`)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ [EventFlex Logo]  Tech Fest 2026              🔔 [3]  👤 John  ☀️/🌙        │
+├──────────────┬──────────────────────────────────────────────────────────────┤
+│              │                                                              │
+│  📊 Dashboard│  ← Back                                                      │
+│  🎫 Events   │                                                              │
+│  📝 My Reg.  │  ┌────────────────────────────────────────────────────────┐  │
+│  👤 Profile  │  │                                                        │  │
+│              │  │              [Event Banner Image]                      │  │
+│  ─────────   │  │                                                        │  │
+│              │  │  [Technology]                                          │  │
+│  [Collapse]  │  │  Tech Fest 2026                                        │  │
+│              │  └────────────────────────────────────────────────────────┘  │
+│              │                                                              │
+│              │  ┌──────────────────────────────────┐  ┌─────────────────┐  │
+│              │  │                                  │  │                 │  │
+│              │  │  #tech  #workshop  #AI  #cloud   │  │  ₹500           │  │
+│              │  │                                  │  │  ✓ Registered   │  │
+│              │  │  About this Event                │  │                 │  │
+│              │  │  ┌──────────────────────────┐    │  │ ████████░░ 80%  │  │
+│              │  │  │ Join us for the annual   │    │  │ 80/100 · 20 left│  │
+│              │  │  │ Tech Fest featuring      │    │  │                 │  │
+│              │  │  │ workshops, competitions, │    │  │ [Register Now   │  │
+│              │  │  │ and exhibitions. Learn   │    │  │  — ₹500]        │  │
+│              │  │  │ from industry experts    │    │  │                 │  │
+│              │  │  │ and showcase your        │    │  │ ─────────────── │  │
+│              │  │  │ technical skills.        │    │  │ 📅 Apr 15, 2026 │  │
+│              │  │  │ Prizes worth ₹50,000!    │    │  │ 📍 Auditorium   │  │
+│              │  │  └──────────────────────────┘    │  │                 │  │
+│              │  │                                  │  └─────────────────┘  │
+│              │  │  Event Details                   │                       │
+│              │  │  ┌──────────────────────────┐    │                       │
+│              │  │  │ 📅 Start  Apr 15, 2026   │    │                       │
+│              │  │  │ 🏁 End    Apr 15, 2026   │    │                       │
+│              │  │  │ 📍 Venue  Main Auditorium │    │                       │
+│              │  │  │ 👥 Cap.   80 / 100        │    │                       │
+│              │  │  │ 💰 Fee    ₹500            │    │                       │
+│              │  │  │ 🧑‍💼 By    Admin Name      │    │                       │
+│              │  │  └──────────────────────────┘    │                       │
+│              │  │                                  │                       │
+│              │  └──────────────────────────────────┘                       │
+│              │                                                              │
+└──────────────┴──────────────────────────────────────────────────────────────┘
+```
+
+Key elements:
+- Full-width hero banner with gradient overlay and title
+- Category badge + tags row
+- Two-column layout: left = About + Event Details, right = sticky registration card
+- Registration card: price, capacity progress bar (color-coded: green→amber→red), CTA button
+- Button states: "Register Now — ₹500" / "Register for Free" / "✓ Already Registered" / "Registration Closed" / "Event Full"
+- "← Back" navigates to previous page
+- Route: `/student/events/:id`
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -248,7 +310,157 @@ This document provides ASCII-based wireframes for all major screens in the Event
 ```
 
 
-### 2.4 My Registrations Page
+### 2.4 Registration Flow — Multi-Step Modal
+
+Triggered when student clicks "Register Now" on the Event Detail Page.
+
+#### Step 1 — Participant Details
+
+```
+┌───────────────────────────────────────────────────────────┐
+│  Registering for: Tech Fest 2026                    [✕]  │
+│  ─────────────────────────────────────────────────────── │
+│  [1. Your Details]  [2. Team]  [3. Confirm & Pay]        │
+│  ─────────────────────────────────────────────────────── │
+│                                                           │
+│  Fill in your details as the primary participant.         │
+│                                                           │
+│  Full Name *                                              │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │ John Doe                                          │   │
+│  └───────────────────────────────────────────────────┘   │
+│                                                           │
+│  BT ID *                                                  │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │ BT22CSE001                                        │   │
+│  └───────────────────────────────────────────────────┘   │
+│                                                           │
+│  Branch *                    Year *                       │
+│  ┌──────────────────────┐   ┌──────────────────────┐     │
+│  │ CSE                  │   │ 2nd Year ▼            │     │
+│  └──────────────────────┘   └──────────────────────┘     │
+│                                                           │
+│                                          [Next →]         │
+└───────────────────────────────────────────────────────────┘
+```
+
+#### Step 2 — Team (Unstop-style)
+
+```
+┌───────────────────────────────────────────────────────────┐
+│  Registering for: Tech Fest 2026                    [✕]  │
+│  ─────────────────────────────────────────────────────── │
+│  [✓ Your Details]  [2. Team]  [3. Confirm & Pay]         │
+│  ─────────────────────────────────────────────────────── │
+│                                                           │
+│  Is this a team participation?                            │
+│  ┌──────────────────┐  ┌──────────────────┐              │
+│  │      Solo        │  │  ● Team          │              │
+│  └──────────────────┘  └──────────────────┘              │
+│                                                           │
+│  Team Name *                                              │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │ Team Innovators                                   │   │
+│  └───────────────────────────────────────────────────┘   │
+│                                                           │
+│  TEAM MEMBERS                                             │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │ Member 1                                          │   │
+│  │ Name: Jane Doe   BT ID: BT22CSE002                │   │
+│  │ Branch: ECE      Year: 2nd Year ▼                 │   │
+│  └───────────────────────────────────────────────────┘   │
+│                                                           │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │ Member 2                              [Remove]    │   │
+│  │ Name: ________   BT ID: __________                │   │
+│  │ Branch: ______   Year: __________ ▼               │   │
+│  └───────────────────────────────────────────────────┘   │
+│                                                           │
+│  [+ Add Member]                                           │
+│                                                           │
+│  [← Back]                                [Next →]         │
+└───────────────────────────────────────────────────────────┘
+```
+
+#### Step 3 — Terms & Confirm / Pay
+
+```
+┌───────────────────────────────────────────────────────────┐
+│  Registering for: Tech Fest 2026                    [✕]  │
+│  ─────────────────────────────────────────────────────── │
+│  [✓ Your Details]  [✓ Team]  [3. Confirm & Pay]          │
+│  ─────────────────────────────────────────────────────── │
+│                                                           │
+│  Registration Summary                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │ Event       Tech Fest 2026                        │   │
+│  │ Participant John Doe                              │   │
+│  │ BT ID       BT22CSE001                            │   │
+│  │ Branch/Year CSE · 2nd Year                        │   │
+│  │ Team        Team Innovators (3 members)           │   │
+│  │ ─────────────────────────────────────────────     │   │
+│  │ Amount      ₹500                                  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                                                           │
+│  ⚠ Terms & Conditions                                     │
+│  • Registration is non-refundable once confirmed.         │
+│  • You must carry this ticket to the event.               │
+│  • Organizer may cancel or reschedule the event.          │
+│  • Participants must follow the code of conduct.          │
+│                                                           │
+│  [✓] I have read and agree to the Terms & Conditions      │
+│                                                           │
+│  [← Back]                          [Pay ₹500 →]           │
+└───────────────────────────────────────────────────────────┘
+```
+
+### 2.5 Digital Ticket (auto-renders after successful registration/payment)
+
+```
+┌───────────────────────────────────────────────────────────┐
+│                                                           │
+│  ┌─────────────────────────────────────────────────────┐  │
+│  │                                                     │  │
+│  │  EventFlex                          ┌──────────┐   │  │
+│  │  Tech Fest 2026                     │  ✓ PAID  │   │  │
+│  │                                     └──────────┘   │  │
+│  │  ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │  │
+│  │                                                     │  │
+│  │  ATTENDEE          SPECIAL ID                       │  │
+│  │  John Doe          EF-2026-TECH-A3F9K2              │  │
+│  │                                                     │  │
+│  │  DATE              VENUE                            │  │
+│  │  Apr 15, 2026      Main Auditorium                  │  │
+│  │                                                     │  │
+│  │  AMOUNT PAID       TEAM                             │  │
+│  │  ₹500              Team Innovators                  │  │
+│  │                                                     │  │
+│  │  TEAM MEMBERS                                       │  │
+│  │  Jane Doe · BT22CSE002 · ECE, 2nd Year              │  │
+│  │  Mike Lee · BT22CSE003 · CSE, 3rd Year              │  │
+│  │                                                     │  │
+│  │  ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │  │
+│  │                                                     │  │
+│  │  ┌──────────┐   Scan at entry                       │  │
+│  │  │  [QR]    │   EF-2026-TECH-A3F9K2                 │  │
+│  │  │          │   eventflex.app                       │  │
+│  │  └──────────┘                                       │  │
+│  │                                                     │  │
+│  └─────────────────────────────────────────────────────┘  │
+│                                                           │
+│  [⬇ Download Image]  [⬇ Download PDF]  [✕ Close]         │
+│                                                           │
+└───────────────────────────────────────────────────────────┘
+```
+
+Ticket fields:
+- Event Name, Student Name, Special ID (format: `EF-YYYY-EVNT-XXXXXX`)
+- Date, Venue, Amount Paid / Free
+- Team Name + Team Members (if team registration)
+- SVG QR code placeholder (deterministic pattern from specialId)
+- Download as PNG image or PDF
+
+### 2.6 My Registrations Page
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -609,4 +821,803 @@ This document provides ASCII-based wireframes for all major screens in the Event
 │              │                                                              │
 └──────────────┴──────────────────────────────────────────────────────────────┘
 ```
+
+
+### 3.5 Admin Analytics Page
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ [EventFlex Logo]  Analytics                   🔔 [5]  👤 Admin  ☀️/🌙       │
+├──────────────┬──────────────────────────────────────────────────────────────┤
+│              │                                                              │
+│  📊 Dashboard│  Event Analytics                                             │
+│  🎫 Events   │                                                              │
+│  📈 Analytics│  Date Range: [Last 30 Days ▼]  [Custom Range]               │
+│  👤 Profile  │                                                              │
+│              │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  ─────────   │  │ Total Events │  │ Total Reg.   │  │ Revenue      │      │
+│              │  │     15       │  │     245      │  │  ₹45,000     │      │
+│  [Collapse]  │  └──────────────┘  └──────────────┘  └──────────────┘      │
+│              │                                                              │
+│              │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│              │  │ Avg. Attend. │  │ Cancellation │  │ Popular Cat. │      │
+│              │  │     82%      │  │ Rate: 5%     │  │  Technology  │      │
+│              │  └──────────────┘  └──────────────┘  └──────────────┘      │
+│              │                                                              │
+│              │  Registration Trends                                         │
+│              │  ┌────────────────────────────────────────────────────────┐  │
+│              │  │                                                        │  │
+│              │  │ 60│                                                    │  │
+│              │  │   │     ╱╲                                             │  │
+│              │  │ 40│    ╱  ╲        ╱╲                                  │  │
+│              │  │   │   ╱    ╲      ╱  ╲      ╱╲                         │  │
+│              │  │ 20│  ╱      ╲    ╱    ╲    ╱  ╲                        │  │
+│              │  │   │ ╱        ╲  ╱      ╲  ╱    ╲                       │  │
+│              │  │  0│╱──────────╲╱────────╲╱──────╲──────────────────    │  │
+│              │  │   └────────────────────────────────────────────────    │  │
+│              │  │    Week 1  Week 2  Week 3  Week 4                      │  │
+│              │  │                                                        │  │
+│              │  └────────────────────────────────────────────────────────┘  │
+│              │                                                              │
+│              │  Events by Category                Revenue by Event         │
+│              │  ┌──────────────────────────┐     ┌──────────────────────┐  │
+│              │  │                          │     │                      │  │
+│              │  │   Technology    40%      │     │ Tech Fest   ₹25,000  │  │
+│              │  │   Cultural      25%      │     │ Hackathon   ₹6,000   │  │
+│              │  │   Sports        20%      │     │ Workshop    ₹8,000   │  │
+│              │  │   Workshop      15%      │     │ Debate      ₹4,000   │  │
+│              │  │                          │     │ Others      ₹2,000   │  │
+│              │  │      [Pie Chart]         │     │   [Bar Chart]        │  │
+│              │  │                          │     │                      │  │
+│              │  └──────────────────────────┘     └──────────────────────┘  │
+│              │                                                              │
+│              │  Top Performing Events                                       │
+│              │  ┌────────────────────────────────────────────────────────┐  │
+│              │  │ Event Name        Registrations  Revenue    Attendance │  │
+│              │  ├────────────────────────────────────────────────────────┤  │
+│              │  │ Tech Fest 2026    50/100         ₹25,000   90%        │  │
+│              │  │ Music Night       200/500        Free       85%        │  │
+│              │  │ Hackathon 2026    30/50          ₹6,000     95%        │  │
+│              │  │ Workshop Series   40/60          ₹8,000     75%        │  │
+│              │  │ Debate Comp.      40/60          ₹4,000     80%        │  │
+│              │  └────────────────────────────────────────────────────────┘  │
+│              │                                                              │
+│              │  [Export Full Report]  [Download PDF]                        │
+│              │                                                              │
+└──────────────┴──────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Principal Role Screens
+
+
+### 4.1 Principal Dashboard
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ [EventFlex Logo]  Principal Dashboard         🔔 [2]  👤 Principal ☀️/🌙   │
+├──────────────┬──────────────────────────────────────────────────────────────┤
+│              │                                                              │
+│  📊 Dashboard│  Platform Overview                                           │
+│  🎫 All Evts │                                                              │
+│  👥 Admins   │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  📈 Reports  │  │ Total Events │  │ Total Admins │  │ Total Stud.  │      │
+│  👤 Profile  │  │     125      │  │     15       │  │    1,250     │      │
+│              │  └──────────────┘  └──────────────┘  └──────────────┘      │
+│  ─────────   │                                                              │
+│              │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  [Collapse]  │  │ Total Reg.   │  │ Revenue      │  │ Active Rate  │      │
+│              │  │    3,450     │  │  ₹5,25,000   │  │     88%      │      │
+│              │  └──────────────┘  └──────────────┘  └──────────────┘      │
+│              │                                                              │
+│              │  Platform Activity (Last 30 Days)                            │
+│              │  ┌────────────────────────────────────────────────────────┐  │
+│              │  │                                                        │  │
+│              │  │100│                                                    │  │
+│              │  │   │     ╱╲        ╱╲                                   │  │
+│              │  │ 75│    ╱  ╲      ╱  ╲      ╱╲                          │  │
+│              │  │   │   ╱    ╲    ╱    ╲    ╱  ╲                         │  │
+│              │  │ 50│  ╱      ╲  ╱      ╲  ╱    ╲      ╱╲               │  │
+│              │  │   │ ╱        ╲╱        ╲╱      ╲    ╱  ╲              │  │
+│              │  │ 25│╱                            ╲  ╱    ╲             │  │
+│              │  │   │                              ╲╱      ╲            │  │
+│              │  │  0│───────────────────────────────────────╲───────    │  │
+│              │  │   └────────────────────────────────────────────────    │  │
+│              │  │    Week 1  Week 2  Week 3  Week 4                      │  │
+│              │  │    ─ Events Created  ─ Registrations                  │  │
+│              │  │                                                        │  │
+│              │  └────────────────────────────────────────────────────────┘  │
+│              │                                                              │
+│              │  Recent Admin Activity                                       │
+│              │  ┌────────────────────────────────────────────────────────┐  │
+│              │  │ Admin         Action           Event           Time    │  │
+│              │  ├────────────────────────────────────────────────────────┤  │
+│              │  │ Admin A       Created Event    Tech Fest       2h ago │  │
+│              │  │ Admin B       Updated Event    Music Night     3h ago │  │
+│              │  │ Admin C       Published Event  Hackathon       5h ago │  │
+│              │  │ Admin A       Deleted Event    Old Workshop    1d ago │  │
+│              │  │ Admin D       Created Event    Art Show        1d ago │  │
+│              │  └────────────────────────────────────────────────────────┘  │
+│              │                                                              │
+│              │  Top Performing Admins (by registrations)                    │
+│              │  ┌────────────────────────────────────────────────────────┐  │
+│              │  │ Admin Name    Events Created  Total Reg.   Revenue     │  │
+│              │  ├────────────────────────────────────────────────────────┤  │
+│              │  │ Admin A       25              850           ₹1,25,000  │  │
+│              │  │ Admin B       20              650           ₹95,000    │  │
+│              │  │ Admin C       18              580           ₹82,000    │  │
+│              │  │ Admin D       15              520           ₹75,000    │  │
+│              │  │ Admin E       12              450           ₹68,000    │  │
+│              │  └────────────────────────────────────────────────────────┘  │
+│              │                                                              │
+└──────────────┴──────────────────────────────────────────────────────────────┘
+```
+
+
+### 4.2 All Events Page (Principal View)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ [EventFlex Logo]  All Events                  🔔 [2]  👤 Principal ☀️/🌙   │
+├──────────────┬──────────────────────────────────────────────────────────────┤
+│              │                                                              │
+│  📊 Dashboard│  All Platform Events                                         │
+│  🎫 All Evts │                                                              │
+│  👥 Admins   │  ┌────────────────────────────────────────────────────────┐  │
+│  📈 Reports  │  │ 🔍 Search events...                    [Search]        │  │
+│  👤 Profile  │  └────────────────────────────────────────────────────────┘  │
+│              │                                                              │
+│  ─────────   │  Filter: [All] [Published] [Draft] [Cancelled]              │
+│              │  Sort by: [Date ▼] [Registrations] [Admin] [Revenue]        │
+│  [Collapse]  │  Admin: [All Admins ▼]                                       │
+│              │                                                              │
+│              │  ┌────────────────────────────────────────────────────────┐  │
+│              │  │ Event Name      Date      Admin    Reg.    Status  Rev.│  │
+│              │  ├────────────────────────────────────────────────────────┤  │
+│              │  │ Tech Fest 2026  Apr 15    Admin A  50/100  ✅  ₹25,000│  │
+│              │  │                 10:00 AM                               │  │
+│              │  │ Main Auditorium · Technology                           │  │
+│              │  │ [View Details] [View Registrants]                      │  │
+│              │  ├────────────────────────────────────────────────────────┤  │
+│              │  │ Music Night     Apr 18    Admin B  200/500 ✅  Free   │  │
+│              │  │                 6:00 PM                                │  │
+│              │  │ Open Air Theatre · Cultural                            │  │
+│              │  │ [View Details] [View Registrants]                      │  │
+│              │  ├────────────────────────────────────────────────────────┤  │
+│              │  │ Hackathon 2026  Apr 22    Admin C  30/50   ✅  ₹6,000 │  │
+│              │  │                 9:00 AM                                │  │
+│              │  │ Computer Lab Block · Technology                        │  │
+│              │  │ [View Details] [View Registrants]                      │  │
+│              │  ├────────────────────────────────────────────────────────┤  │
+│              │  │ Art Workshop    Apr 25    Admin A  15/30   📝  Free   │  │
+│              │  │                 2:00 PM                                │  │
+│              │  │ Art Room · Workshop                                    │  │
+│              │  │ [View Details]                                         │  │
+│              │  ├────────────────────────────────────────────────────────┤  │
+│              │  │ Debate Comp.    Apr 28    Admin D  40/60   ✅  ₹4,000 │  │
+│              │  │                 3:00 PM                                │  │
+│              │  │ Hall 3 · Cultural                                      │  │
+│              │  │ [View Details] [View Registrants]                      │  │
+│              │  ├────────────────────────────────────────────────────────┤  │
+│              │  │ Food Fest       May 01    Admin B  300/500 ✅  Free   │  │
+│              │  │                 11:00 AM                               │  │
+│              │  │ Campus Ground · Cultural                               │  │
+│              │  │ [View Details] [View Registrants]                      │  │
+│              │  └────────────────────────────────────────────────────────┘  │
+│              │                                                              │
+│              │  [Export All Events CSV]  [Generate Report]                  │
+│              │                                                              │
+│              │  ◀ Previous  [1] [2] [3] ... [10]  Next ▶                    │
+│              │                                                              │
+└──────────────┴──────────────────────────────────────────────────────────────┘
+```
+
+
+### 4.3 Admin Activity Page
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ [EventFlex Logo]  Admin Activity              🔔 [2]  👤 Principal ☀️/🌙   │
+├──────────────┬──────────────────────────────────────────────────────────────┤
+│              │                                                              │
+│  📊 Dashboard│  Admin Activity & Management                                 │
+│  🎫 All Evts │                                                              │
+│  👥 Admins   │  ┌────────────────────────────────────────────────────────┐  │
+│  📈 Reports  │  │ 🔍 Search admin by name or email...    [Search]        │  │
+│  👤 Profile  │  └────────────────────────────────────────────────────────┘  │
+│              │                                                              │
+│  ─────────   │  Date Range: [Last 30 Days ▼]  [Custom Range]               │
+│              │  Activity Type: [All] [Create] [Update] [Delete] [Publish]  │
+│  [Collapse]  │                                                              │
+│              │  Admin Performance Summary                                   │
+│              │  ┌────────────────────────────────────────────────────────┐  │
+│              │  │ Admin Name    Events  Reg.   Revenue   Status  Actions │  │
+│              │  ├────────────────────────────────────────────────────────┤  │
+│              │  │ Admin A       25      850    ₹1,25,000  🟢     [⋮]    │  │
+│              │  │ [email protected]                                    │  │
+│              │  │ Last Active: 2 hours ago                               │  │
+│              │  │ [View Details] [View Events] [Toggle Status]           │  │
+│              │  ├────────────────────────────────────────────────────────┤  │
+│              │  │ Admin B       20      650    ₹95,000   🟢     [⋮]    │  │
+│              │  │ [email protected]                                    │  │
+│              │  │ Last Active: 5 hours ago                               │  │
+│              │  │ [View Details] [View Events] [Toggle Status]           │  │
+│              │  ├────────────────────────────────────────────────────────┤  │
+│              │  │ Admin C       18      580    ₹82,000   🟢     [⋮]    │  │
+│              │  │ [email protected]                                    │  │
+│              │  │ Last Active: 1 day ago                                 │  │
+│              │  │ [View Details] [View Events] [Toggle Status]           │  │
+│              │  ├────────────────────────────────────────────────────────┤  │
+│              │  │ Admin D       15      520    ₹75,000   🔴     [⋮]    │  │
+│              │  │ [email protected]                                    │  │
+│              │  │ Last Active: 7 days ago (Inactive)                     │  │
+│              │  │ [View Details] [View Events] [Toggle Status]           │  │
+│              │  └────────────────────────────────────────────────────────┘  │
+│              │                                                              │
+│              │  Recent Activity Log                                         │
+│              │  ┌────────────────────────────────────────────────────────┐  │
+│              │  │ Time        Admin     Action           Event/Target    │  │
+│              │  ├────────────────────────────────────────────────────────┤  │
+│              │  │ 2h ago      Admin A   Created Event    Tech Fest 2026  │  │
+│              │  │ 3h ago      Admin B   Updated Event    Music Night     │  │
+│              │  │ 5h ago      Admin C   Published Event  Hackathon 2026  │  │
+│              │  │ 8h ago      Admin A   Deleted Event    Old Workshop    │  │
+│              │  │ 1d ago      Admin D   Created Event    Art Exhibition  │  │
+│              │  │ 1d ago      Admin B   Updated Event    Food Fest       │  │
+│              │  │ 2d ago      Admin C   Published Event  Debate Comp.    │  │
+│              │  │ 2d ago      Admin A   Created Event    Sports Day      │  │
+│              │  │ 3d ago      Admin E   Updated Event    Career Fair     │  │
+│              │  │ 3d ago      Admin B   Deleted Event    Cancelled Meet  │  │
+│              │  └────────────────────────────────────────────────────────┘  │
+│              │                                                              │
+│              │  ◀ Previous  [1] [2] [3] ... [20]  Next ▶                    │
+│              │                                                              │
+│              │  [Export Activity Report]  [Download Audit Log]              │
+│              │                                                              │
+└──────────────┴──────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Common Components
+
+
+### 5.1 Navbar Component
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│  [EventFlex Logo]  Page Title                  🔔 [3]  👤 User  ☀️/🌙      │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Elements:
+- Logo (left): Clickable, navigates to dashboard
+- Page Title (center-left): Current page name
+- Notification Bell (right): Badge with count, dropdown on click
+- User Avatar (right): Dropdown menu with Profile, Settings, Logout
+- Theme Toggle (right): Sun/Moon icon for light/dark mode
+```
+
+### 5.2 Sidebar Component
+
+```
+┌──────────────┐
+│              │
+│  📊 Dashboard│  ← Active state (highlighted)
+│  🎫 Events   │
+│  📝 My Reg.  │
+│  👤 Profile  │
+│              │
+│  ─────────   │
+│              │
+│  [Collapse]  │  ← Collapse to icon-only mode
+│              │
+└──────────────┘
+
+States:
+- Expanded: 240px width, shows icons + text
+- Collapsed: 64px width, shows icons only
+- Mobile: Drawer overlay, swipe to open/close
+- Active item: Highlighted background + accent color
+```
+
+### 5.3 Event Card Component
+
+```
+┌──────────────┐
+│ [Banner Img] │
+│              │
+│ Tech Fest    │
+│ 2026         │
+│              │
+│ 📅 Apr 15    │
+│ 📍 Auditorium│
+│ 💰 ₹500      │
+│ 👥 50/100    │
+│              │
+│ [Register]   │
+└──────────────┘
+
+Variants:
+- Grid view: 3 columns on desktop, 2 on tablet, 1 on mobile
+- List view: Full width with horizontal layout
+- Hover state: Slight elevation, scale transform
+- Disabled state: Greyed out when full or cancelled
+```
+
+### 5.4 Modal Component
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                                                                 [✕]   │  │
+│  │                                                                       │  │
+│  │  Modal Title                                                          │  │
+│  │                                                                       │  │
+│  │  ─────────────────────────────────────────────────────────────────   │  │
+│  │                                                                       │  │
+│  │  Modal content goes here...                                           │  │
+│  │                                                                       │  │
+│  │                                                                       │  │
+│  │                                                                       │  │
+│  │  ─────────────────────────────────────────────────────────────────   │  │
+│  │                                                                       │  │
+│  │                                    [Cancel]  [Confirm]                │  │
+│  │                                                                       │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Features:
+- Backdrop overlay (semi-transparent)
+- Close on backdrop click or ESC key
+- Centered on screen
+- Responsive width (max-width: 600px)
+- Smooth fade-in animation
+```
+
+### 5.5 Toast Notification Component
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  ✅  Success! Event registered successfully.          [✕]  │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  ⚠️  Warning! Event is almost full.                   [✕]  │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  ❌  Error! Registration failed. Please try again.    [✕]  │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  ℹ️  Info: New event published by Admin A.            [✕]  │
+└─────────────────────────────────────────────────────────────┘
+
+Position: Top-right corner
+Duration: 3-5 seconds (auto-dismiss)
+Animation: Slide in from right, fade out
+Stacking: Multiple toasts stack vertically
+```
+
+### 5.6 Pagination Component
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│  ◀ Previous  [1] [2] [3] ... [10]  Next ▶                   │
+│                                                             │
+│  Showing 21-30 of 95 results                                │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+
+Features:
+- Current page highlighted
+- Ellipsis for large page counts
+- Disabled state for first/last page
+- Items per page selector (optional)
+```
+
+### 5.7 Search Bar Component
+
+```
+┌────────────────────────────────────────────────────────────┐
+│ 🔍 Search events...                            [Search]    │
+└────────────────────────────────────────────────────────────┘
+
+Features:
+- Debounced input (300ms delay)
+- Clear button when text present
+- Search on Enter key
+- Loading indicator during search
+- Autocomplete suggestions (optional)
+```
+
+### 5.8 Empty State Component
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│                         📭                                  │
+│                                                             │
+│                  No events found                            │
+│                                                             │
+│         Try adjusting your filters or search query          │
+│                                                             │
+│                   [Browse All Events]                       │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 5.9 Loading State Component
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│                         ⏳                                  │
+│                                                             │
+│                    Loading events...                        │
+│                                                             │
+│                   [Spinner Animation]                       │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 5.10 Error State Component
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│                         ⚠️                                  │
+│                                                             │
+│              Something went wrong                           │
+│                                                             │
+│         Failed to load events. Please try again.            │
+│                                                             │
+│                      [Retry]                                │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Responsive Behavior
+
+
+### 6.1 Desktop Layout (≥1024px)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  Navbar (Full width, 64px height)                                          │
+├──────────────┬──────────────────────────────────────────────────────────────┤
+│              │                                                              │
+│   Sidebar    │                Main Content Area                            │
+│   (240px)    │                (Fluid width)                                 │
+│              │                                                              │
+│   Expanded   │   - 3 column event grid                                      │
+│   with text  │   - Full tables with all columns                             │
+│              │   - Side-by-side charts                                      │
+│              │                                                              │
+└──────────────┴──────────────────────────────────────────────────────────────┘
+```
+
+### 6.2 Tablet Layout (768px - 1023px)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  Navbar (Full width, 64px height)                                          │
+├──────────────┬──────────────────────────────────────────────────────────────┤
+│              │                                                              │
+│   Sidebar    │                Main Content Area                            │
+│   (64px)     │                (Fluid width)                                 │
+│              │                                                              │
+│   Icon-only  │   - 2 column event grid                                      │
+│   collapsed  │   - Responsive tables (scroll horizontal)                    │
+│              │   - Stacked charts                                           │
+│              │                                                              │
+└──────────────┴──────────────────────────────────────────────────────────────┘
+```
+
+### 6.3 Mobile Layout (<768px)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Navbar (Full width, 64px height)                          │
+│  [☰ Menu]  EventFlex              🔔 [3]  👤              │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│                  Main Content Area                          │
+│                  (Full width)                               │
+│                                                             │
+│   - 1 column event grid                                     │
+│   - Card-based tables (stacked layout)                      │
+│   - Full-width charts                                       │
+│   - Bottom navigation (optional)                            │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+
+Sidebar: Drawer overlay (slides from left)
+Forms: Single column, full width inputs
+Modals: Full screen on mobile
+```
+
+### 6.4 Breakpoint Summary
+
+| Breakpoint | Width | Sidebar | Grid Columns | Table Layout |
+|------------|-------|---------|--------------|--------------|
+| Desktop | ≥1024px | 240px expanded | 3 columns | Full table |
+| Tablet | 768-1023px | 64px collapsed | 2 columns | Horizontal scroll |
+| Mobile | <768px | Drawer overlay | 1 column | Card-based |
+
+### 6.5 Touch Interactions (Mobile/Tablet)
+
+- Swipe left on sidebar to close drawer
+- Swipe right from edge to open sidebar
+- Pull to refresh on event lists
+- Long press on event card for quick actions
+- Tap outside modal/drawer to close
+
+### 6.6 Accessibility Features
+
+- Keyboard navigation support (Tab, Enter, Esc)
+- ARIA labels on all interactive elements
+- Focus indicators on all focusable elements
+- Screen reader announcements for dynamic content
+- High contrast mode support
+- Minimum touch target size: 44x44px
+- Color contrast ratio: WCAG AA compliant
+
+---
+
+## Payment Flow Wireframe
+
+### 7.1 Payment Modal (Razorpay/Stripe)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                                                                 [✕]   │  │
+│  │                                                                       │  │
+│  │  Complete Your Registration                                           │  │
+│  │                                                                       │  │
+│  │  ─────────────────────────────────────────────────────────────────   │  │
+│  │                                                                       │  │
+│  │  Event: Tech Fest 2026                                                │  │
+│  │  Date: April 15, 2026 · 10:00 AM                                     │  │
+│  │  Venue: Main Auditorium                                               │  │
+│  │                                                                       │  │
+│  │  ─────────────────────────────────────────────────────────────────   │  │
+│  │                                                                       │  │
+│  │  Registration Fee: ₹500                                               │  │
+│  │  Platform Fee: ₹10                                                    │  │
+│  │  ─────────────────────────────────────────────────────────────────   │  │
+│  │  Total Amount: ₹510                                                   │  │
+│  │                                                                       │  │
+│  │  ─────────────────────────────────────────────────────────────────   │  │
+│  │                                                                       │  │
+│  │  Payment Method:                                                      │  │
+│  │  ○ Credit/Debit Card                                                  │  │
+│  │  ○ UPI                                                                │  │
+│  │  ○ Net Banking                                                        │  │
+│  │  ○ Wallet                                                             │  │
+│  │                                                                       │  │
+│  │  ┌─────────────────────────────────────────────────────────────────┐  │  │
+│  │  │              PROCEED TO PAYMENT (₹510)                          │  │  │
+│  │  └─────────────────────────────────────────────────────────────────┘  │  │
+│  │                                                                       │  │
+│  │  🔒 Secure payment powered by Razorpay                                │  │
+│  │                                                                       │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 7.2 Payment Success Screen
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                                                                       │  │
+│  │                            ✅                                         │  │
+│  │                                                                       │  │
+│  │                  Payment Successful!                                  │  │
+│  │                                                                       │  │
+│  │         You're registered for Tech Fest 2026                          │  │
+│  │                                                                       │  │
+│  │  ─────────────────────────────────────────────────────────────────   │  │
+│  │                                                                       │  │
+│  │  Transaction ID: TXN-ABC123456                                        │  │
+│  │  Amount Paid: ₹510                                                    │  │
+│  │  Payment Method: UPI                                                  │  │
+│  │  Date: April 1, 2026 · 2:30 PM                                       │  │
+│  │                                                                       │  │
+│  │  Registration ID: REG-2026-001234                                     │  │
+│  │                                                                       │  │
+│  │  ─────────────────────────────────────────────────────────────────   │  │
+│  │                                                                       │  │
+│  │  A confirmation email has been sent to [email protected]      │  │
+│  │                                                                       │  │
+│  │  ┌─────────────────────────────────────────────────────────────────┐  │  │
+│  │  │                    DOWNLOAD TICKET                              │  │  │
+│  │  └─────────────────────────────────────────────────────────────────┘  │  │
+│  │                                                                       │  │
+│  │  [View My Registrations]  [Browse More Events]                        │  │
+│  │                                                                       │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 7.3 Payment Failed Screen
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                                                                       │  │
+│  │                            ❌                                         │  │
+│  │                                                                       │  │
+│  │                   Payment Failed                                      │  │
+│  │                                                                       │  │
+│  │         Your payment could not be processed                           │  │
+│  │                                                                       │  │
+│  │  ─────────────────────────────────────────────────────────────────   │  │
+│  │                                                                       │  │
+│  │  Reason: Insufficient funds                                           │  │
+│  │  Transaction ID: TXN-XYZ789012                                        │  │
+│  │  Date: April 1, 2026 · 2:30 PM                                       │  │
+│  │                                                                       │  │
+│  │  Don't worry, no amount has been deducted from your account.          │  │
+│  │                                                                       │  │
+│  │  ─────────────────────────────────────────────────────────────────   │  │
+│  │                                                                       │  │
+│  │  ┌─────────────────────────────────────────────────────────────────┐  │  │
+│  │  │                    TRY AGAIN                                    │  │  │
+│  │  └─────────────────────────────────────────────────────────────────┘  │  │
+│  │                                                                       │  │
+│  │  [Contact Support]  [Back to Event]                                   │  │
+│  │                                                                       │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Real-Time Notification Examples
+
+### 8.1 Notification Dropdown
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Notifications                                        [3]   │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  🎉 New Event Published                          2m ago    │
+│  "Hackathon 2026" is now open for registration             │
+│  [View Event]                                               │
+│  ─────────────────────────────────────────────────────────  │
+│                                                             │
+│  ✅ Registration Confirmed                       1h ago    │
+│  Your registration for "Tech Fest 2026" is confirmed       │
+│  [View Details]                                             │
+│  ─────────────────────────────────────────────────────────  │
+│                                                             │
+│  ⚠️ Event Update                                 3h ago    │
+│  "Music Night" venue changed to Open Air Theatre           │
+│  [View Changes]                                             │
+│  ─────────────────────────────────────────────────────────  │
+│                                                             │
+│  [Mark All as Read]  [View All Notifications]              │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 8.2 Real-Time Updates (Socket.io)
+
+**Student receives notification when:**
+- New event is published
+- Registered event is updated/cancelled
+- Registration status changes
+- Payment confirmation received
+
+**Admin receives notification when:**
+- New registration for their event
+- Student cancels registration
+- Event reaches capacity threshold (80%, 90%, 100%)
+
+**Principal receives notification when:**
+- Admin creates/updates/deletes event
+- Platform milestone reached (e.g., 1000th registration)
+- System alerts or issues
+
+---
+
+## Design System
+
+### 9.1 Color Palette
+
+**Light Mode:**
+- Primary: #3B82F6 (Blue)
+- Secondary: #8B5CF6 (Purple)
+- Success: #10B981 (Green)
+- Warning: #F59E0B (Amber)
+- Error: #EF4444 (Red)
+- Background: #FFFFFF
+- Surface: #F9FAFB
+- Text Primary: #111827
+- Text Secondary: #6B7280
+
+**Dark Mode:**
+- Primary: #60A5FA (Light Blue)
+- Secondary: #A78BFA (Light Purple)
+- Success: #34D399 (Light Green)
+- Warning: #FBBF24 (Light Amber)
+- Error: #F87171 (Light Red)
+- Background: #111827
+- Surface: #1F2937
+- Text Primary: #F9FAFB
+- Text Secondary: #9CA3AF
+
+### 9.2 Typography
+
+- Font Family: Inter, system-ui, sans-serif
+- Headings: 
+  - H1: 2.5rem (40px), Bold
+  - H2: 2rem (32px), Bold
+  - H3: 1.5rem (24px), Semibold
+  - H4: 1.25rem (20px), Semibold
+- Body: 1rem (16px), Regular
+- Small: 0.875rem (14px), Regular
+- Caption: 0.75rem (12px), Regular
+
+### 9.3 Spacing Scale
+
+- xs: 0.25rem (4px)
+- sm: 0.5rem (8px)
+- md: 1rem (16px)
+- lg: 1.5rem (24px)
+- xl: 2rem (32px)
+- 2xl: 3rem (48px)
+
+### 9.4 Border Radius
+
+- sm: 0.25rem (4px)
+- md: 0.5rem (8px)
+- lg: 0.75rem (12px)
+- xl: 1rem (16px)
+- full: 9999px (circular)
+
+### 9.5 Shadows
+
+- sm: 0 1px 2px rgba(0,0,0,0.05)
+- md: 0 4px 6px rgba(0,0,0,0.1)
+- lg: 0 10px 15px rgba(0,0,0,0.1)
+- xl: 0 20px 25px rgba(0,0,0,0.1)
+
+---
+
+## Conclusion
+
+This wireframe documentation provides a comprehensive visual guide for implementing the EventFlex platform. All screens follow consistent design patterns, responsive behavior, and accessibility standards. The wireframes serve as a blueprint for frontend development and ensure a cohesive user experience across all user roles.
+
+**Key Design Principles:**
+- Consistency: Unified component library and design system
+- Responsiveness: Mobile-first approach with adaptive layouts
+- Accessibility: WCAG AA compliance with keyboard navigation
+- Performance: Optimized loading states and real-time updates
+- User-Centric: Clear information hierarchy and intuitive navigation
+
+**Next Steps:**
+1. Review wireframes with stakeholders
+2. Create high-fidelity mockups in Figma/Adobe XD
+3. Develop component library in React + Tailwind CSS
+4. Implement responsive layouts and interactions
+5. Conduct usability testing and iterate
 
