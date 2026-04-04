@@ -12,3 +12,7 @@ export const createPaymentOrderApi = (eventId, formData) =>
         ...formData
     });
 export const verifyPaymentApi = (data) => api.post('/payments/verify', data);
+export const retryPaymentOrderApi = (registrationId) =>
+    api.post('/payments/retry-order', {
+        registrationId
+    });

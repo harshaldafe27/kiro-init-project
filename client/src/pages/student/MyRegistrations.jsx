@@ -1,12 +1,20 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getMyRegistrationsApi, cancelRegistrationApi } from '../../api/registration.api';
+import { retryPaymentOrderApi, verifyPaymentApi } from '../../api/registration.api';
 import { formatDate } from '../../utils/formatDate';
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
 import DigitalTicket from '../../components/student/DigitalTicket';
 import { useToast } from '../../hooks/useToast';
 import useStore from '../../store/useStore';
+
+const openRazorpay = (options) =>
+  new Promise((resolve, reject) => {
+    const rzp = new window.Razorpay({ ...options, handler: resolve });
+    rzp.on('payment.failed', reject);
+    rzp.open();
+  });
 
 const statusColor = {
   confirmed: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
@@ -40,6 +48,39 @@ export default function MyRegistrations() {
     },
     onError: (err) => toast.error(err.response?.data?.message || 'Failed to cancel'),
   });
+
+  const [retryingId, setRetryingId] = useState(null);
+
+  const handleRetryPayment = async (reg) => {
+    setRetryingId(reg._id);
+    try {
+      const { data } = await retryPaymentOrderApi(reg._id);
+      const { orderId, amount, key, registrationId, eventTitle } = data.data;
+      let response;
+      try {
+        response = await openRazorpay({
+          key, amount, currency: 'INR', order_id: orderId,
+          name: 'EventFlex', description: eventTitle,
+          theme: { color: '#6366f1' },
+        });
+      } catch {
+        toast.info('Payment cancelled');
+        return;
+      }
+      await verifyPaymentApi({
+        orderId: response.razorpay_order_id,
+        paymentId: response.razorpay_payment_id,
+        signature: response.razorpay_signature,
+        registrationId,
+      });
+      toast.success('Payment successful!');
+      qc.invalidateQueries({ queryKey: ['my-registrations'] });
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Payment failed');
+    } finally {
+      setRetryingId(null);
+    }
+  };
 
   const buildTicket = (reg) => ({
     specialId: reg.specialId || reg._id,
@@ -116,6 +157,15 @@ export default function MyRegistrations() {
                     className="flex-1 py-2 rounded-xl text-sm font-medium border border-indigo-300 dark:border-indigo-700 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
                   >
                     🎫 View Ticket
+                  </button>
+                )}
+                {reg.paymentStatus === 'pending' && reg.status !== 'cancelled' && (
+                  <button
+                    onClick={() => handleRetryPayment(reg)}
+                    disabled={retryingId === reg._id}
+                    className="flex-1 py-2 rounded-xl text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white transition-colors disabled:opacity-50"
+                  >
+                    {retryingId === reg._id ? 'Processing...' : '💳 Complete Payment'}
                   </button>
                 )}
                 {reg.status !== 'cancelled' && (

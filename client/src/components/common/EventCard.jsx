@@ -27,7 +27,9 @@ export default function EventCard({ event, onEdit, onDelete, role }) {
         {event.category && (
           <span className="text-xs bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded-full">{event.category}</span>
         )}
-        <p className="text-gray-500 dark:text-gray-400 text-sm mt-2 line-clamp-2">{event.description}</p>
+        <p className="text-gray-500 dark:text-gray-400 text-sm mt-2 line-clamp-2">
+          {event.description ? event.description.replace(/<[^>]*>/g, '') : ''}
+        </p>
         <div className="mt-3 space-y-1 text-xs text-gray-500 dark:text-gray-400">
           <div className="flex items-center gap-1.5">📅 <span>{formatDate(event.date)}</span></div>
           <div className="flex items-center gap-1.5">📍 <span>{event.venue}</span></div>
