@@ -1,4 +1,5 @@
 import ThemeToggle from './ThemeToggle';
+import NotificationBell from './NotificationBell';
 import useStore from '../../store/useStore';
 
 const roleBadge = { student: 'bg-blue-100 text-blue-700', admin: 'bg-purple-100 text-purple-700', principal: 'bg-amber-100 text-amber-700' };
@@ -10,6 +11,7 @@ export default function Navbar({ title }) {
       <h1 className="text-base font-semibold text-gray-800 dark:text-white">{title}</h1>
       <div className="flex items-center gap-3">
         <ThemeToggle />
+        {user?.role === 'student' && <NotificationBell />}
         {user && (
           <div className="flex items-center gap-2">
             <span className={`text-xs font-medium px-2 py-0.5 rounded-full capitalize ${roleBadge[user.role] || 'bg-gray-100 text-gray-600'}`}>{user.role}</span>

@@ -8,6 +8,7 @@ import EmptyState from '../../components/common/EmptyState';
 import DigitalTicket from '../../components/student/DigitalTicket';
 import { useToast } from '../../hooks/useToast';
 import useStore from '../../store/useStore';
+import { Download } from 'lucide-react';
 
 const openRazorpay = (options) =>
   new Promise((resolve, reject) => {
@@ -33,6 +34,24 @@ export default function MyRegistrations() {
   const qc = useQueryClient();
   const user = useStore((s) => s.user);
   const [ticket, setTicket] = useState(null);
+  const [downloadingId, setDownloadingId] = useState(null);
+
+  const handleDownloadCertificate = async (regId) => {
+    setDownloadingId(regId);
+    try {
+      const response = await downloadCertificateApi(regId);
+      const url = URL.createObjectURL(response.data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'certificate.pdf';
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error('Failed to download certificate');
+    } finally {
+      setDownloadingId(null);
+    }
+  };
 
   const { data, isLoading } = useQuery({
     queryKey: ['my-registrations'],

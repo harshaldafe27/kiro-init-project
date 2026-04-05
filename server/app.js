@@ -32,6 +32,8 @@ app.use('/api/v1/registrations', require('./routes/registration.routes'));
 app.use('/api/v1/analytics', require('./routes/analytics.routes'));
 app.use('/api/v1/payments', require('./routes/payment.routes'));
 app.use('/api/v1/export', require('./routes/export.routes'));
+app.use('/api/v1/notifications', require('./routes/notification.routes'));
+app.use('/api/v1/certificates', require('./routes/certificate.routes'));
 
 // Centralized error handler (must be last)
 app.use(errorHandler);

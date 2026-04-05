@@ -8,7 +8,8 @@ const {
 const {
     getAdminStats,
     getPlatformStats,
-    getAdminActivity
+    getAdminActivity,
+    getEventAnalytics
 } = require('../controllers/analytics.controller');
 
 const router = express.Router();
@@ -16,5 +17,6 @@ const router = express.Router();
 router.get('/admin', protect, authorize('admin'), getAdminStats);
 router.get('/platform', protect, authorize('principal'), getPlatformStats);
 router.get('/admin-activity', protect, authorize('principal'), getAdminActivity);
+router.get('/event/:id', protect, authorize('admin'), getEventAnalytics);
 
 module.exports = router;

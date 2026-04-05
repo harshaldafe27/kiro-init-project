@@ -21,6 +21,7 @@ const {
     getRegistrants,
     getAdminEvents,
     getAllEvents,
+    markEventComplete,
 } = require('../controllers/event.controller');
 
 const router = express.Router();
@@ -42,6 +43,7 @@ router.post('/', protect, authorize('admin'), createEventValidation, validate, c
 router.put('/:id', protect, authorize('admin'), updateEvent);
 router.delete('/:id', protect, authorize('admin'), deleteEvent);
 router.patch('/:id/publish', protect, authorize('admin'), togglePublish);
+router.patch('/:id/complete', protect, authorize('admin'), markEventComplete);
 router.get('/:id/registrants', protect, authorize('admin'), getRegistrants);
 
 module.exports = router;
