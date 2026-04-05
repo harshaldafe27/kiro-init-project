@@ -14,7 +14,7 @@ app.use(cors({
     credentials: true
 }));
 
-// Body parsers
+// Body parsers — 10mb limit to support base64 banner images
 app.use(express.json({
     limit: '10mb'
 }));

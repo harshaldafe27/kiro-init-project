@@ -176,8 +176,51 @@ const getPaymentHistory = async (req, res) => {
     }
 };
 
+const retryOrder = async (req, res) => {
+    try {
+        const {
+            registrationId
+        } = req.body;
+        const reg = await Registrations.findById(registrationId);
+        if (!reg) return errorResponse(res, 'Registration not found', 404);
+        if (String(reg.student) !== String(req.user._id)) return errorResponse(res, 'Forbidden', 403);
+        if (reg.paymentStatus === 'paid') return errorResponse(res, 'Already paid', 400);
+        if (reg.status === 'cancelled') return errorResponse(res, 'Registration is cancelled', 400);
+
+        const event = await Events.findById(reg.event);
+        if (!event || event.isCancelled) return errorResponse(res, 'Event not available', 404);
+
+        const receipt = ('rcpt_' + reg._id).slice(0, 40);
+        const order = await paymentService.createOrder({
+            amount: Math.round(reg.amount * 100),
+            currency: 'INR',
+            receipt,
+            notes: {
+                eventId: event._id,
+                studentId: req.user._id,
+                registrationId: reg._id
+            }
+        });
+        await Registrations.update(reg._id, {
+            orderId: order.id
+        });
+
+        return successResponse(res, {
+            orderId: order.id,
+            amount: order.amount,
+            currency: order.currency,
+            key: RAZORPAY_KEY_ID,
+            registrationId: reg._id,
+            eventTitle: event.title
+        }, 'Retry order created', 201);
+    } catch (err) {
+        return errorResponse(res, err.message, 500);
+    }
+};
+
 module.exports = {
     createOrder,
     verifyPayment,
-    getPaymentHistory
+    getPaymentHistory,
+    retryOrder
 };

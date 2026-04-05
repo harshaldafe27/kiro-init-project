@@ -79,21 +79,27 @@ export default function EventDetailPage() {
       if (event.fee > 0) {
         const { data } = await createPaymentOrderApi(event._id, formData);
         const { orderId, amount, key, registrationId } = data.data;
-        const response = await openRazorpay({
-          key, amount, currency: 'INR', order_id: orderId,
-          name: 'EventFlex', description: event.title,
-          theme: { color: '#6366f1' },
-        });
+        let response;
+        try {
+          response = await openRazorpay({
+            key, amount, currency: 'INR', order_id: orderId,
+            name: 'EventFlex', description: event.title,
+            theme: { color: '#6366f1' },
+          });
+        } catch {
+          // Student dismissed Razorpay — registration exists with paymentStatus: 'pending'
+          throw { __razorpayDismissed: true };
+        }
         const verifyRes = await verifyPaymentApi({
           orderId: response.razorpay_order_id,
           paymentId: response.razorpay_payment_id,
           signature: response.razorpay_signature,
           registrationId,
         });
-        return verifyRes.data.data; // { registration, event }
+        return verifyRes.data.data;
       }
       const res = await registerForEventApi(event._id, formData);
-      return res.data.data; // { registration }
+      return res.data.data;
     },
     onSuccess: (data) => {
       toast.success('Registered successfully!');
@@ -101,11 +107,16 @@ export default function EventDetailPage() {
       qc.invalidateQueries({ queryKey: ['my-registrations'] });
       qc.invalidateQueries({ queryKey: ['events'] });
       qc.invalidateQueries({ queryKey: ['event', id] });
-      // Show ticket immediately — data comes from verifyPayment or registerForEvent
       const reg = data?.registration;
       if (reg) setTicket(buildTicket(reg));
     },
     onError: (err) => {
+      if (err?.__razorpayDismissed) {
+        setShowModal(false);
+        qc.invalidateQueries({ queryKey: ['my-registrations'] });
+        toast.info('Payment pending — complete it from My Registrations');
+        return;
+      }
       toast.error(err.response?.data?.message || 'Registration failed');
     },
   });

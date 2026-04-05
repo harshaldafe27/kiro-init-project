@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getMyRegistrationsApi, cancelRegistrationApi } from '../../api/registration.api';
-import { downloadCertificateApi } from '../../api/certificate.api';
+import { retryPaymentOrderApi, verifyPaymentApi } from '../../api/registration.api';
 import { formatDate } from '../../utils/formatDate';
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
@@ -9,6 +9,13 @@ import DigitalTicket from '../../components/student/DigitalTicket';
 import { useToast } from '../../hooks/useToast';
 import useStore from '../../store/useStore';
 import { Download } from 'lucide-react';
+
+const openRazorpay = (options) =>
+  new Promise((resolve, reject) => {
+    const rzp = new window.Razorpay({ ...options, handler: resolve });
+    rzp.on('payment.failed', reject);
+    rzp.open();
+  });
 
 const statusColor = {
   confirmed: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
@@ -60,6 +67,39 @@ export default function MyRegistrations() {
     },
     onError: (err) => toast.error(err.response?.data?.message || 'Failed to cancel'),
   });
+
+  const [retryingId, setRetryingId] = useState(null);
+
+  const handleRetryPayment = async (reg) => {
+    setRetryingId(reg._id);
+    try {
+      const { data } = await retryPaymentOrderApi(reg._id);
+      const { orderId, amount, key, registrationId, eventTitle } = data.data;
+      let response;
+      try {
+        response = await openRazorpay({
+          key, amount, currency: 'INR', order_id: orderId,
+          name: 'EventFlex', description: eventTitle,
+          theme: { color: '#6366f1' },
+        });
+      } catch {
+        toast.info('Payment cancelled');
+        return;
+      }
+      await verifyPaymentApi({
+        orderId: response.razorpay_order_id,
+        paymentId: response.razorpay_payment_id,
+        signature: response.razorpay_signature,
+        registrationId,
+      });
+      toast.success('Payment successful!');
+      qc.invalidateQueries({ queryKey: ['my-registrations'] });
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Payment failed');
+    } finally {
+      setRetryingId(null);
+    }
+  };
 
   const buildTicket = (reg) => ({
     specialId: reg.specialId || reg._id,
@@ -138,23 +178,13 @@ export default function MyRegistrations() {
                     🎫 View Ticket
                   </button>
                 )}
-                {reg.certificateAvailable && reg.status === 'confirmed' && (
+                {reg.paymentStatus === 'pending' && reg.status !== 'cancelled' && (
                   <button
-                    onClick={() => handleDownloadCertificate(reg._id)}
-                    disabled={downloadingId === reg._id}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-sm font-medium border border-emerald-300 dark:border-emerald-700 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors disabled:opacity-50"
+                    onClick={() => handleRetryPayment(reg)}
+                    disabled={retryingId === reg._id}
+                    className="flex-1 py-2 rounded-xl text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white transition-colors disabled:opacity-50"
                   >
-                    {downloadingId === reg._id ? (
-                      <>
-                        <span className="animate-spin h-3.5 w-3.5 border-2 border-emerald-500 border-t-transparent rounded-full" />
-                        Downloading...
-                      </>
-                    ) : (
-                      <>
-                        <Download size={14} />
-                        Certificate
-                      </>
-                    )}
+                    {retryingId === reg._id ? 'Processing...' : '💳 Complete Payment'}
                   </button>
                 )}
                 {reg.status !== 'cancelled' && (
