@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getMyRegistrationsApi, cancelRegistrationApi } from '../../api/registration.api';
+import { downloadCertificateApi } from '../../api/certificate.api';
 import { formatDate } from '../../utils/formatDate';
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
 import DigitalTicket from '../../components/student/DigitalTicket';
 import { useToast } from '../../hooks/useToast';
 import useStore from '../../store/useStore';
+import { Download } from 'lucide-react';
 
 const statusColor = {
   confirmed: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
@@ -25,6 +27,24 @@ export default function MyRegistrations() {
   const qc = useQueryClient();
   const user = useStore((s) => s.user);
   const [ticket, setTicket] = useState(null);
+  const [downloadingId, setDownloadingId] = useState(null);
+
+  const handleDownloadCertificate = async (regId) => {
+    setDownloadingId(regId);
+    try {
+      const response = await downloadCertificateApi(regId);
+      const url = URL.createObjectURL(response.data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'certificate.pdf';
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error('Failed to download certificate');
+    } finally {
+      setDownloadingId(null);
+    }
+  };
 
   const { data, isLoading } = useQuery({
     queryKey: ['my-registrations'],
@@ -116,6 +136,25 @@ export default function MyRegistrations() {
                     className="flex-1 py-2 rounded-xl text-sm font-medium border border-indigo-300 dark:border-indigo-700 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
                   >
                     🎫 View Ticket
+                  </button>
+                )}
+                {reg.certificateAvailable && reg.status === 'confirmed' && (
+                  <button
+                    onClick={() => handleDownloadCertificate(reg._id)}
+                    disabled={downloadingId === reg._id}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-sm font-medium border border-emerald-300 dark:border-emerald-700 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors disabled:opacity-50"
+                  >
+                    {downloadingId === reg._id ? (
+                      <>
+                        <span className="animate-spin h-3.5 w-3.5 border-2 border-emerald-500 border-t-transparent rounded-full" />
+                        Downloading...
+                      </>
+                    ) : (
+                      <>
+                        <Download size={14} />
+                        Certificate
+                      </>
+                    )}
                   </button>
                 )}
                 {reg.status !== 'cancelled' && (

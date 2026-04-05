@@ -110,8 +110,43 @@ const getAdminActivity = async (req, res) => {
     }
 };
 
+const getEventAnalytics = async (req, res) => {
+    try {
+        const event = await Events.findById(req.params.id);
+        if (!event) return errorResponse(res, 'Event not found', 404);
+        if (event.createdBy !== req.user._id) return errorResponse(res, 'Forbidden', 403);
+
+        const registrations = await Registrations.findByEvent(req.params.id);
+        const totalRegistrations = registrations.length;
+        const totalRevenue = registrations
+            .filter((r) => r.paymentStatus === 'paid')
+            .reduce((s, r) => s + (r.amount || 0), 0);
+
+        const dateMap = {};
+        for (const r of registrations) {
+            const date = (r.registeredAt || r.createdAt || '').slice(0, 10);
+            if (date) dateMap[date] = (dateMap[date] || 0) + 1;
+        }
+        const registrationSeries = Object.entries(dateMap)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([date, count]) => ({
+                date,
+                count
+            }));
+
+        return successResponse(res, {
+            totalRegistrations,
+            totalRevenue,
+            registrationSeries
+        }, 'Event analytics fetched');
+    } catch (err) {
+        return errorResponse(res, err.message, 500);
+    }
+};
+
 module.exports = {
     getAdminStats,
     getPlatformStats,
-    getAdminActivity
+    getAdminActivity,
+    getEventAnalytics
 };
