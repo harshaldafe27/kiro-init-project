@@ -1,18 +1,18 @@
 student registration process:
 
-student browses events on the dashboard or "Browse Events" page and clicks "View Details" on an event card → lands on EventDetailPage
+1.student clicks "View Details" on an event card → lands on EventDetailPage
 
-on the detail page, they see event info, capacity bar, and a "Register Now" button. if the event is full or past deadline, the button is disabled
+2.clicks "Register Now" → RegistrationModal opens (3 steps: personal details → solo/team → summary + T&C)
 
-clicking "Register Now" opens the RegistrationModal — a 3-step flow:
+3.on confirm, two paths:
 
-step 1 — fill personal details (name, BT ID, branch, year)
-step 2 — choose solo or team (if team: add team name + member details)
-step 3 — review summary + accept T&C → confirm
-on confirm, two paths:
+free event → POST /registrations directly → registration confirmed
+paid event → POST /payments/create-order → Razorpay popup opens
+student pays → POST /payments/verify → registration confirmed
+student dismisses popup → modal closes, registration saved with paymentStatus: 'pending', info toast shown
 
-free event → hits POST /registrations directly
-paid event → hits POST /payments/create-order first, opens Razorpay popup, student pays, then POST /payments/verify is called to confirm payment
-on success → modal closes, queries invalidate (refreshes registration count), and a DigitalTicket modal pops up immediately with the ticket details
+4. on success → digital ticket shown immediately
 
-next time the student visits the same event detail page, they see "Already Registered" + a "View My Ticket" button that re-opens the ticket
+5.if payment was dismissed → student goes to "My Registrations", sees the pending registration with a "💳 Complete Payment" button → clicking it calls POST /payments/retry-order → Razorpay reopens → on payment, POST /payments/verify confirms it
+
+6. returning to any event detail page where already registered → shows "Already Registered" + "🎫 View My Ticket" button
