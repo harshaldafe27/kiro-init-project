@@ -5,11 +5,10 @@ student registration process:
 2.clicks "Register Now" → RegistrationModal opens (3 steps: personal details → solo/team → summary + T&C)
 
 3.on confirm, two paths:
-
-free event → POST /registrations directly → registration confirmed
-paid event → POST /payments/create-order → Razorpay popup opens
-student pays → POST /payments/verify → registration confirmed
-student dismisses popup → modal closes, registration saved with paymentStatus: 'pending', info toast shown
+    step1 - free event → POST /registrations directly → registration confirmed
+    step2 - paid event → POST /payments/create-order → Razorpay popup opens
+    step3 - student pays → POST /payments/verify → registration confirmed
+    step4 - student dismisses popup → modal closes, registration saved with paymentStatus: 'pending', info toast shown
 
 4. on success → digital ticket shown immediately
 

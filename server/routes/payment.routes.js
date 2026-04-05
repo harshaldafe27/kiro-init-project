@@ -14,7 +14,8 @@ const {
 const {
     createOrder,
     verifyPayment,
-    getPaymentHistory
+    getPaymentHistory,
+    retryOrder
 } = require('../controllers/payment.controller');
 
 const router = express.Router();
@@ -46,5 +47,15 @@ router.post(
 
 // GET /api/v1/payments/history
 router.get('/history', protect, authorize('student'), getPaymentHistory);
+
+// POST /api/v1/payments/retry-order
+router.post(
+    '/retry-order',
+    protect,
+    authorize('student'),
+    [body('registrationId').notEmpty().withMessage('registrationId is required')],
+    validate,
+    retryOrder
+);
 
 module.exports = router;
