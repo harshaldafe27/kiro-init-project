@@ -5,36 +5,69 @@ const {
 } = require('pdf-lib');
 
 /**
- * Generates a participation certificate PDF.
- * @param {{ participantName: string, eventName: string, eventDate: string|Date }} params
+ * Overlays participant name on an uploaded PDF template.
+ * Falls back to a built-in design if no template is provided.
+ *
+ * @param {{
+ *   participantName: string,
+ *   eventName: string,
+ *   eventDate: string|Date,
+ *   templateBase64?: string,   // base64-encoded PDF template
+ *   nameX?: number,            // x position for name (pdf-lib coords from bottom-left)
+ *   nameY?: number,            // y position for name
+ *   fontSize?: number
+ * }} params
  * @returns {Promise<Uint8Array>}
  */
 async function generateCertificate({
     participantName,
     eventName,
-    eventDate
+    eventDate,
+    templateBase64,
+    nameX,
+    nameY,
+    fontSize
 }) {
-    const pdfDoc = await PDFDocument.create();
+    const date = new Date(eventDate);
+    const formattedDate = date.toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    });
 
-    // Landscape A4: width=842, height=595 points
+    // ── Template mode ──────────────────────────────────────────────────────────
+    if (templateBase64) {
+        const templateBytes = Buffer.from(templateBase64, 'base64');
+        const pdfDoc = await PDFDocument.load(templateBytes);
+        const pages = pdfDoc.getPages();
+        const page = pages[0];
+        const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+        const x = nameX != null ? Number(nameX) : page.getWidth() / 2 - boldFont.widthOfTextAtSize(participantName, fontSize || 28) / 2;
+        const y = nameY != null ? Number(nameY) : page.getHeight() / 2;
+        const size = fontSize ? Number(fontSize) : 28;
+
+        page.drawText(participantName, {
+            x,
+            y,
+            size,
+            font: boldFont,
+            color: rgb(0.1, 0.1, 0.1),
+        });
+
+        return pdfDoc.save();
+    }
+
+    // ── Built-in fallback design ───────────────────────────────────────────────
+    const pdfDoc = await PDFDocument.create();
     const page = pdfDoc.addPage([842, 595]);
     const {
         width,
         height
     } = page.getSize();
-
     const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
     const regularFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-    // Format date
-    const date = new Date(eventDate);
-    const formattedDate = date.toLocaleDateString('en-GB', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-    });
-
-    // Decorative border rectangle (inset ~20pt from edges)
     const borderInset = 20;
     page.drawRectangle({
         x: borderInset,
@@ -42,35 +75,29 @@ async function generateCertificate({
         width: width - borderInset * 2,
         height: height - borderInset * 2,
         borderColor: rgb(0.4, 0.2, 0.6),
-        borderWidth: 3,
+        borderWidth: 3
     });
-
-    // Inner border for decoration
     page.drawRectangle({
         x: borderInset + 6,
         y: borderInset + 6,
         width: width - (borderInset + 6) * 2,
         height: height - (borderInset + 6) * 2,
         borderColor: rgb(0.6, 0.4, 0.8),
-        borderWidth: 1,
+        borderWidth: 1
     });
 
-    // Helper to center text horizontally
     const centerText = (text, font, size, y) => {
-        const textWidth = font.widthOfTextAtSize(text, size);
+        const tw = font.widthOfTextAtSize(text, size);
         page.drawText(text, {
-            x: (width - textWidth) / 2,
+            x: (width - tw) / 2,
             y,
             size,
             font,
-            color: rgb(0.1, 0.1, 0.1),
+            color: rgb(0.1, 0.1, 0.1)
         });
     };
 
-    // Title: "Certificate of Participation"
     centerText('Certificate of Participation', boldFont, 32, height - 100);
-
-    // Decorative line under title
     page.drawLine({
         start: {
             x: 100,
@@ -81,37 +108,25 @@ async function generateCertificate({
             y: height - 115
         },
         thickness: 1.5,
-        color: rgb(0.4, 0.2, 0.6),
+        color: rgb(0.4, 0.2, 0.6)
     });
-
-    // "This is to certify that"
     centerText('This is to certify that', regularFont, 16, height - 165);
-
-    // Participant name (large, bold)
     centerText(participantName, boldFont, 28, height - 215);
-
-    // Underline for participant name
-    const nameWidth = boldFont.widthOfTextAtSize(participantName, 28);
+    const nw = boldFont.widthOfTextAtSize(participantName, 28);
     page.drawLine({
         start: {
-            x: (width - nameWidth) / 2,
+            x: (width - nw) / 2,
             y: height - 220
         },
         end: {
-            x: (width + nameWidth) / 2,
+            x: (width + nw) / 2,
             y: height - 220
         },
         thickness: 1,
-        color: rgb(0.3, 0.3, 0.3),
+        color: rgb(0.3, 0.3, 0.3)
     });
-
-    // "has successfully participated in"
     centerText('has successfully participated in', regularFont, 16, height - 265);
-
-    // Event name (medium, bold)
     centerText(eventName, boldFont, 22, height - 305);
-
-    // "held on " + formatted date
     centerText('held on ' + formattedDate, regularFont, 16, height - 355);
 
     return pdfDoc.save();

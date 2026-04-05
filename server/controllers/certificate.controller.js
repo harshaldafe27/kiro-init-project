@@ -17,6 +17,12 @@ const distributeCertificates = async (req, res, next) => {
         const {
             eventId
         } = req.params;
+        const {
+            templateBase64,
+            nameX,
+            nameY,
+            fontSize
+        } = req.body;
 
         const event = await Events.findById(eventId);
         if (!event) return errorResponse(res, 'Event not found', 404);
@@ -35,6 +41,14 @@ const distributeCertificates = async (req, res, next) => {
                 distributed: 0
             }, 'No eligible registrants found');
         }
+
+        // Save template config on the event so download can reuse it
+        await Events.update(eventId, {
+            certificateTemplate: templateBase64 || null,
+            certificateNameX: nameX != null ? Number(nameX) : null,
+            certificateNameY: nameY != null ? Number(nameY) : null,
+            certificateFontSize: fontSize ? Number(fontSize) : null,
+        });
 
         const ids = confirmed.map((r) => r._id);
         await Registrations.setCertificateAvailable(ids);
@@ -79,12 +93,16 @@ const downloadCertificate = async (req, res, next) => {
             Users.findById(req.user._id),
         ]);
 
-        const participantName = registration.participantDetails ? .name || user.name;
+        const participantName = (registration.participantDetails && registration.participantDetails.name) || user.name;
 
         const pdfBytes = await generateCertificate({
             participantName,
             eventName: event.title,
             eventDate: event.date,
+            templateBase64: event.certificateTemplate || null,
+            nameX: event.certificateNameX,
+            nameY: event.certificateNameY,
+            fontSize: event.certificateFontSize,
         });
 
         res.setHeader('Content-Type', 'application/pdf');
