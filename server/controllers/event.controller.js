@@ -1,7 +1,8 @@
 const {
     Events,
     Registrations,
-    Users
+    Users,
+    Notifications
 } = require('../models/db');
 const {
     logAudit
@@ -131,6 +132,9 @@ const deleteEvent = async (req, res) => {
         await Registrations.deleteByEvent(req.params.id);
         await Events.delete(req.params.id);
         try {
+            await Notifications.nullifyEventId(req.params.id);
+        } catch (_) {}
+        try {
             await logAudit({
                 actor: req.user._id,
                 action: 'DELETE_EVENT',
@@ -162,6 +166,9 @@ const togglePublish = async (req, res) => {
         const event = await Events.findById(req.params.id);
         if (!event) return errorResponse(res, 'Event not found', 404);
         if (event.createdBy !== req.user._id) return errorResponse(res, 'Forbidden', 403);
+        if (!event.isPublished && event.approvalStatus !== 'approved') {
+            return errorResponse(res, 'Principal approval is required before publishing', 403);
+        }
         const updated = await Events.update(req.params.id, {
             isPublished: !event.isPublished
         });
@@ -258,6 +265,21 @@ const getAllEvents = async (req, res) => {
     }
 };
 
+const markEventComplete = async (req, res) => {
+    try {
+        const event = await Events.findById(req.params.id);
+        if (!event) return errorResponse(res, 'Event not found', 404);
+        if (event.createdBy !== req.user._id) return errorResponse(res, 'Forbidden', 403);
+        if (event.isCompleted === true) return errorResponse(res, 'Event is already marked as completed', 400);
+        const updated = await Events.markComplete(req.params.id);
+        return successResponse(res, {
+            event: updated
+        }, 'Event marked as completed');
+    } catch (err) {
+        return errorResponse(res, err.message, 500);
+    }
+};
+
 module.exports = {
     listEvents,
     getEvent,
@@ -267,5 +289,6 @@ module.exports = {
     togglePublish,
     getRegistrants,
     getAdminEvents,
-    getAllEvents
+    getAllEvents,
+    markEventComplete
 };

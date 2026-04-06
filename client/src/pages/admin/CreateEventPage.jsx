@@ -10,6 +10,7 @@ import {
   ImageIcon, Clock, AlertCircle, CheckCircle2, Loader2,
 } from 'lucide-react';
 import { createEventApi, updateEventApi, getEventApi } from '../../api/event.api';
+import { submitApprovalRequestApi } from '../../api/approval.api';
 import { useToast } from '../../hooks/useToast';
 
 // ── Zod schema ────────────────────────────────────────────────────────────────
@@ -112,8 +113,8 @@ export default function CreateEventPage() {
 
   const mutation = useMutation({
     mutationFn: (payload) => isEdit ? updateEventApi(id, payload) : createEventApi(payload),
-    onSuccess: (_, vars) => {
-      toast.success(vars.isPublished ? 'Event published!' : 'Draft saved!');
+    onSuccess: (res, vars) => {
+      toast.success('Draft saved!');
       qc.invalidateQueries({ queryKey: ['admin-events'] });
       qc.invalidateQueries({ queryKey: ['events'] });
       localStorage.removeItem('eventflex_draft');
@@ -122,7 +123,17 @@ export default function CreateEventPage() {
     onError: (err) => toast.error(err.response?.data?.message || 'Failed to save event'),
   });
 
-  const buildPayload = (data, isPublished) => ({
+  const approvalMutation = useMutation({
+    mutationFn: (savedId) => submitApprovalRequestApi(savedId),
+    onSuccess: () => {
+      toast.success('Approval request sent to principal!');
+      qc.invalidateQueries({ queryKey: ['admin-events'] });
+      navigate('/admin/events');
+    },
+    onError: (err) => toast.error(err.response?.data?.message || 'Failed to submit request'),
+  });
+
+  const buildPayload = (data) => ({
     title: data.title,
     category: data.category,
     mode: data.mode,
@@ -140,11 +151,27 @@ export default function CreateEventPage() {
     maxTeamSize: data.isTeam ? Number(data.maxTeamSize) : undefined,
     tags: data.tags ? data.tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
     banner: data.banner || bannerPreview || '',
-    isPublished,
+    isPublished: false,
   });
 
-  const onPublish = handleSubmit((data) => mutation.mutate(buildPayload(data, true)));
-  const onDraft   = handleSubmit((data) => mutation.mutate(buildPayload(data, false)));
+  const onDraft = handleSubmit((data) => mutation.mutate(buildPayload(data)));
+
+  const onRequestApproval = handleSubmit(async (data) => {
+    try {
+      const payload = buildPayload(data);
+      let savedId = id;
+      if (isEdit) {
+        await updateEventApi(id, payload);
+      } else {
+        const res = await createEventApi(payload);
+        savedId = res.data.data.event._id;
+        localStorage.removeItem('eventflex_draft');
+      }
+      approvalMutation.mutate(savedId);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to save event');
+    }
+  });
 
   // Banner: compress + resize to max 1200px wide, quality 0.75, then base64
   const fileToBase64 = (file) =>
@@ -204,14 +231,14 @@ export default function CreateEventPage() {
             className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
             <Eye size={15} /> Preview
           </button>
-          <button type="button" onClick={onDraft} disabled={mutation.isPending}
+          <button type="button" onClick={onDraft} disabled={mutation.isPending || approvalMutation.isPending}
             className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50">
             <Save size={15} /> {mutation.isPending ? 'Saving...' : 'Save Draft'}
           </button>
-          <button type="button" onClick={onPublish} disabled={mutation.isPending}
+          <button type="button" onClick={onRequestApproval} disabled={mutation.isPending || approvalMutation.isPending}
             className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-colors disabled:opacity-50">
-            {mutation.isPending ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
-            {isEdit ? 'Update' : 'Publish'}
+            {approvalMutation.isPending ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
+            {isEdit ? 'Resubmit for Approval' : 'Request Approval'}
           </button>
         </div>
       </div>
@@ -389,13 +416,13 @@ export default function CreateEventPage() {
 
         {/* Sticky bottom actions (mobile) */}
         <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 p-4 flex gap-3 z-30">
-          <button type="button" onClick={onDraft} disabled={mutation.isPending}
+          <button type="button" onClick={onDraft} disabled={mutation.isPending || approvalMutation.isPending}
             className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 transition-colors disabled:opacity-50">
             Save Draft
           </button>
-          <button type="button" onClick={onPublish} disabled={mutation.isPending}
+          <button type="button" onClick={onRequestApproval} disabled={mutation.isPending || approvalMutation.isPending}
             className="flex-1 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-colors disabled:opacity-50">
-            {mutation.isPending ? 'Publishing...' : 'Publish'}
+            {approvalMutation.isPending ? 'Submitting...' : 'Request Approval'}
           </button>
         </div>
         <div className="h-20 sm:h-0" /> {/* spacer for sticky bar */}

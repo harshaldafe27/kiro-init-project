@@ -4,3 +4,4 @@ export const getPlatformStatsApi = () => api.get('/analytics/platform');
 export const getAdminActivityApi = (params) => api.get('/analytics/admin-activity', {
     params
 });
+export const getEventAnalyticsApi = (id) => api.get(`/analytics/event/${id}`);

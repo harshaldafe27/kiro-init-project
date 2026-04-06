@@ -1,19 +1,34 @@
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { getRegistrantsApi } from '../../api/event.api';
+import { getRegistrantsApi, exportRegistrantsCSVApi } from '../../api/event.api';
 import { formatDate } from '../../utils/formatDate';
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
+import { useToast } from '../../hooks/useToast';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 
 export default function EventRegistrants() {
   const { id } = useParams();
+  const toast = useToast();
+  const navigate = useNavigate();
   const { data, isLoading } = useQuery({
     queryKey: ['registrants', id],
     queryFn: () => getRegistrantsApi(id).then((r) => r.data.data),
   });
 
-  const handleExportCSV = () => {
-    window.open(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'}/export/event/${id}/csv`, '_blank');
+  const handleExportCSV = async () => {
+    try {
+      const response = await exportRegistrantsCSVApi(id);
+      const url = URL.createObjectURL(response.data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `registrants-${id}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error('Export failed');
+    }
   };
 
   if (isLoading) return <Loader />;
@@ -22,7 +37,14 @@ export default function EventRegistrants() {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Event Registrants</h2>
+        <div className="flex items-center gap-3">
+          <button onClick={() => navigate('/admin/events')}
+            className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            title="Back to Events">
+            <ArrowLeft size={18} />
+          </button>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Event Registrants</h2>
+        </div>
         <button onClick={handleExportCSV} className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-medium transition-colors">
           Export CSV
         </button>

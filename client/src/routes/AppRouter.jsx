@@ -11,17 +11,20 @@ import EventBrowse from '../pages/student/EventBrowse';
 import EventDetailPage from '../pages/student/EventDetailPage';
 import MyRegistrations from '../pages/student/MyRegistrations';
 import Profile from '../pages/student/Profile';
+import NotificationCenter from '../pages/student/NotificationCenter';
 
 import AdminDashboard from '../pages/admin/AdminDashboard';
 import ManageEvents from '../pages/admin/ManageEvents';
 import CreateEventPage from '../pages/admin/CreateEventPage';
 import EventRegistrants from '../pages/admin/EventRegistrants';
-import ScanEntry from '../pages/admin/ScanEntry';
+import AnnouncementsPage from '../pages/admin/AnnouncementsPage';
+import EventAnalyticsPage from '../pages/admin/EventAnalyticsPage';
 
 import PrincipalDashboard from '../pages/principal/PrincipalDashboard';
 import AllEvents from '../pages/principal/AllEvents';
 import AdminActivity from '../pages/principal/AdminActivity';
-import EntryLogs from '../pages/principal/EntryLogs';
+import PrincipalAnnouncements from '../pages/principal/PrincipalAnnouncements';
+import ApprovalRequests from '../pages/principal/ApprovalRequests';
 
 export default function AppRouter() {
   return (
@@ -36,6 +39,7 @@ export default function AppRouter() {
         <Route path="events/:id" element={<EventDetailPage />} />
         <Route path="registrations" element={<MyRegistrations />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="notifications" element={<NotificationCenter />} />
       </Route>
 
       {/* Admin routes */}
@@ -45,7 +49,8 @@ export default function AppRouter() {
         <Route path="events/create" element={<CreateEventPage />} />
         <Route path="events/:id/edit" element={<CreateEventPage />} />
         <Route path="events/:id/registrants" element={<EventRegistrants />} />
-        <Route path="scan" element={<ScanEntry />} />
+        <Route path="events/:id/analytics" element={<EventAnalyticsPage />} />
+        <Route path="announcements" element={<AnnouncementsPage />} />
         <Route path="profile" element={<Profile />} />
       </Route>
 
@@ -55,6 +60,8 @@ export default function AppRouter() {
         <Route path="events" element={<AllEvents />} />
         <Route path="entry-logs" element={<EntryLogs />} />
         <Route path="activity" element={<AdminActivity />} />
+        <Route path="announcements" element={<PrincipalAnnouncements />} />
+        <Route path="approvals" element={<ApprovalRequests />} />
       </Route>
 
       <Route path="/" element={<Navigate to="/login" replace />} />

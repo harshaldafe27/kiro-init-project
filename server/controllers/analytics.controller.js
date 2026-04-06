@@ -21,7 +21,7 @@ const getAdminStats = async (req, res) => {
             limit: 1000
         });
         const eventIds = events.map((e) => e._id);
-        const regs = await Registrations.findByEventIds(eventIds);
+        const regs = eventIds.length > 0 ? await Registrations.findByEventIds(eventIds) : [];
         const totalRevenue = regs.filter((r) => r.paymentStatus === 'paid').reduce((s, r) => s + (r.amount || 0), 0);
         const eventsData = events.map((event) => {
             const eRegs = regs.filter((r) => r.event === event._id);
@@ -40,17 +40,21 @@ const getAdminStats = async (req, res) => {
             eventsData
         }, 'Admin stats fetched');
     } catch (err) {
+        console.error('[getAdminStats error]', err);
         return errorResponse(res, err.message, 500);
     }
 };
 
 const getPlatformStats = async (req, res) => {
     try {
-        const [totalEvents, totalRegistrations, activeAdmins] = await Promise.all([
+        const [totalEvents, totalRegistrations] = await Promise.all([
             Events.countAll(),
             Registrations.countAll(),
-            Users.countWhere('role', '==', 'admin'),
         ]);
+        const allUsers = await Users.findAll({
+            limit: 1000
+        });
+        const activeAdmins = allUsers.filter((u) => u.role === 'admin').length;
         const {
             events
         } = await Events.findAll({
@@ -62,7 +66,7 @@ const getPlatformStats = async (req, res) => {
             return acc;
         }, {});
         const eventIds = events.map((e) => e._id);
-        const paidRegs = await Registrations.findPaidByEventIds(eventIds);
+        const paidRegs = eventIds.length > 0 ? await Registrations.findPaidByEventIds(eventIds) : [];
         const totalRevenue = paidRegs.reduce((s, r) => s + (r.amount || 0), 0);
         return successResponse(res, {
             totalEvents,
@@ -72,6 +76,7 @@ const getPlatformStats = async (req, res) => {
             categoryBreakdown
         }, 'Platform stats fetched');
     } catch (err) {
+        console.error('[getPlatformStats error]', err);
         return errorResponse(res, err.message, 500);
     }
 };
@@ -110,8 +115,43 @@ const getAdminActivity = async (req, res) => {
     }
 };
 
+const getEventAnalytics = async (req, res) => {
+    try {
+        const event = await Events.findById(req.params.id);
+        if (!event) return errorResponse(res, 'Event not found', 404);
+        if (event.createdBy !== req.user._id) return errorResponse(res, 'Forbidden', 403);
+
+        const registrations = await Registrations.findByEvent(req.params.id);
+        const totalRegistrations = registrations.length;
+        const totalRevenue = registrations
+            .filter((r) => r.paymentStatus === 'paid')
+            .reduce((s, r) => s + (r.amount || 0), 0);
+
+        const dateMap = {};
+        for (const r of registrations) {
+            const date = (r.registeredAt || r.createdAt || '').slice(0, 10);
+            if (date) dateMap[date] = (dateMap[date] || 0) + 1;
+        }
+        const registrationSeries = Object.entries(dateMap)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([date, count]) => ({
+                date,
+                count
+            }));
+
+        return successResponse(res, {
+            totalRegistrations,
+            totalRevenue,
+            registrationSeries
+        }, 'Event analytics fetched');
+    } catch (err) {
+        return errorResponse(res, err.message, 500);
+    }
+};
+
 module.exports = {
     getAdminStats,
     getPlatformStats,
-    getAdminActivity
+    getAdminActivity,
+    getEventAnalytics
 };
