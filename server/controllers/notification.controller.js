@@ -70,9 +70,10 @@ const createAnnouncement = async (req, res, next) => {
         }));
 
         // Create announcement first
+        const adminUser = await Users.findById(req.user._id);
         const announcement = await Announcements.create({
             senderId: req.user._id,
-            senderName: req.user.name,
+            senderName: adminUser ? adminUser.name : 'Admin',
             title: title.trim(),
             message: message.trim(),
             audienceType,
@@ -189,7 +190,8 @@ const getUnreadCount = async (req, res, next) => {
     try {
         const count = await Notifications.countUnread(req.user._id);
         return successResponse(res, {
-            count
+            count,
+            unreadCount: count
         }, 'Unread count fetched');
     } catch (err) {
         next(err);
