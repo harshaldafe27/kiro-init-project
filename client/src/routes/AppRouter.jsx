@@ -24,6 +24,7 @@ import PrincipalDashboard from '../pages/principal/PrincipalDashboard';
 import AllEvents from '../pages/principal/AllEvents';
 import AdminActivity from '../pages/principal/AdminActivity';
 import PrincipalAnnouncements from '../pages/principal/PrincipalAnnouncements';
+import ApprovalRequests from '../pages/principal/ApprovalRequests';
 
 export default function AppRouter() {
   return (
@@ -59,6 +60,7 @@ export default function AppRouter() {
         <Route path="events" element={<AllEvents />} />
         <Route path="activity" element={<AdminActivity />} />
         <Route path="announcements" element={<PrincipalAnnouncements />} />
+        <Route path="approvals" element={<ApprovalRequests />} />
       </Route>
 
       <Route path="/" element={<Navigate to="/login" replace />} />

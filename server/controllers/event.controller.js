@@ -166,6 +166,9 @@ const togglePublish = async (req, res) => {
         const event = await Events.findById(req.params.id);
         if (!event) return errorResponse(res, 'Event not found', 404);
         if (event.createdBy !== req.user._id) return errorResponse(res, 'Forbidden', 403);
+        if (!event.isPublished && event.approvalStatus !== 'approved') {
+            return errorResponse(res, 'Principal approval is required before publishing', 403);
+        }
         const updated = await Events.update(req.params.id, {
             isPublished: !event.isPublished
         });

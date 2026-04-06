@@ -14,12 +14,15 @@ const navItems = {
   admin: [
     { to: '/admin', label: 'Dashboard', icon: '📊' },
     { to: '/admin/events', label: 'Manage Events', icon: '🗂️' },
+    { to: '/admin/announcements', label: 'Announcements', icon: '📢' },
     { to: '/admin/profile', label: 'Profile', icon: '👤' },
   ],
   principal: [
     { to: '/principal', label: 'Dashboard', icon: '📈' },
     { to: '/principal/events', label: 'All Events', icon: '🎯' },
+    { to: '/principal/approvals', label: 'Approvals', icon: '✅' },
     { to: '/principal/activity', label: 'Admin Activity', icon: '🔍' },
+    { to: '/principal/announcements', label: 'Announcements', icon: '📢' },
   ],
 };
 

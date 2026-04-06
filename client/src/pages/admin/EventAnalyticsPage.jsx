@@ -1,6 +1,8 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getEventAnalyticsApi } from '../../api/analytics.api';
+import { exportRegistrantsCSVApi } from '../../api/event.api';
+import { useToast } from '../../hooks/useToast';
 import Loader from '../../components/common/Loader';
 import ErrorState from '../../components/common/ErrorState';
 import {
@@ -11,23 +13,31 @@ import { ArrowLeft } from 'lucide-react';
 export default function EventAnalyticsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const toast = useToast();
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['event-analytics', id],
     queryFn: () => getEventAnalyticsApi(id).then((r) => r.data.data),
   });
 
+  const handleExportCSV = async () => {
+    try {
+      const response = await exportRegistrantsCSVApi(id);
+      const url = URL.createObjectURL(response.data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `registrants-${id}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error('Export failed');
+    }
+  };
+
   if (isLoading) return <Loader />;
-  if (isError) return <ErrorState message="Failed to load analytics" />;
+  if (isError) return <ErrorState onRetry={refetch} />;
 
   const { totalRegistrations = 0, totalRevenue = 0, registrationSeries = [] } = data || {};
-
-  const handleExportCSV = () => {
-    window.open(
-      `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'}/export/event/${id}/csv`,
-      '_blank'
-    );
-  };
 
   return (
     <div className="space-y-6">

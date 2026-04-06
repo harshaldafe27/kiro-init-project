@@ -86,9 +86,10 @@ const Events = {
         const now = new Date().toISOString();
         const event = {
             registeredCount: 0,
-            isPublished: true,
+            isPublished: false,
             isCancelled: false,
             fee: 0,
+            approvalStatus: null,
             ...data,
             createdAt: now,
             updatedAt: now
@@ -442,6 +443,75 @@ const Notifications = {
     },
 };
 
+// ─── ApprovalRequests ─────────────────────────────────────────────────────────
+
+const ApprovalRequests = {
+    async create(data) {
+        const ref = col('approvalRequests').doc();
+        const doc = {
+            status: 'pending',
+            rejectionReason: null,
+            ...data,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+        await ref.set(doc);
+        return {
+            _id: ref.id,
+            ...doc
+        };
+    },
+    async findById(id) {
+        return docToObj(await col('approvalRequests').doc(id).get());
+    },
+    async findByEvent(eventId) {
+        const snap = await col('approvalRequests').where('eventId', '==', eventId).get();
+        const all = sortByDate(snapToArr(snap));
+        return all[0] || null; // latest request for this event
+    },
+    async findPending({
+        limit = 50,
+        offset = 0
+    } = {}) {
+        const snap = await col('approvalRequests').where('status', '==', 'pending').get();
+        const all = sortByDate(snapToArr(snap));
+        return {
+            requests: all.slice(offset, offset + limit),
+            total: all.length
+        };
+    },
+    async findAll({
+        limit = 50,
+        offset = 0
+    } = {}) {
+        const snap = await col('approvalRequests').get();
+        const all = sortByDate(snapToArr(snap));
+        return {
+            requests: all.slice(offset, offset + limit),
+            total: all.length
+        };
+    },
+    async findByAdmin(adminId, {
+        limit = 50,
+        offset = 0
+    } = {}) {
+        const snap = await col('approvalRequests').where('adminId', '==', adminId).get();
+        const all = sortByDate(snapToArr(snap));
+        return {
+            requests: all.slice(offset, offset + limit),
+            total: all.length
+        };
+    },
+    async update(id, data) {
+        const ref = col('approvalRequests').doc(id);
+        await ref.update({
+            ...data,
+            updatedAt: new Date().toISOString()
+        });
+        return docToObj(await ref.get());
+    },
+};
+
 module.exports = {
     Users,
     Events,
@@ -449,5 +519,6 @@ module.exports = {
     AuditLogs,
     Announcements,
     Notifications,
+    ApprovalRequests,
     col
 };

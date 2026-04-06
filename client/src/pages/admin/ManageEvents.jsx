@@ -9,7 +9,7 @@ import EmptyState from '../../components/common/EmptyState';
 import Modal from '../../components/common/Modal';
 import CertificatePositionPicker from '../../components/admin/CertificatePositionPicker';
 import { useToast } from '../../hooks/useToast';
-import { Plus, Pencil, Users, Trash2, Eye, EyeOff, BarChart2, CheckCircle, Award, Upload, X } from 'lucide-react';
+import { Plus, Pencil, Users, Trash2, Eye, EyeOff, BarChart2, CheckCircle, Award, Upload, X, Send } from 'lucide-react';
 
 export default function ManageEvents() {
   const navigate = useNavigate();
@@ -127,18 +127,30 @@ export default function ManageEvents() {
                         <span className="flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 w-fit">
                           <CheckCircle size={11} /> Completed
                         </span>
-                      ) : (
+                      ) : event.approvalStatus === 'approved' ? (
                         <button
                           onClick={() => publishMutation.mutate(event._id)}
                           className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full transition-colors ${
                             event.isPublished
                               ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-200'
-                              : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-200'
+                              : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 hover:bg-indigo-200'
                           }`}
                         >
-                          {event.isPublished ? <Eye size={11} /> : <EyeOff size={11} />}
-                          {event.isPublished ? 'Published' : 'Draft'}
+                          {event.isPublished ? <Eye size={11} /> : <Send size={11} />}
+                          {event.isPublished ? 'Published' : 'Publish Now'}
                         </button>
+                      ) : event.approvalStatus === 'pending' ? (
+                        <span className="flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 w-fit">
+                          Pending Approval
+                        </span>
+                      ) : event.approvalStatus === 'rejected' ? (
+                        <span className="flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 w-fit">
+                          Rejected
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 w-fit">
+                          Draft
+                        </span>
                       )}
                     </td>
                     <td className="px-4 py-3">
