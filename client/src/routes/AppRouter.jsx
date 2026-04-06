@@ -16,10 +16,12 @@ import AdminDashboard from '../pages/admin/AdminDashboard';
 import ManageEvents from '../pages/admin/ManageEvents';
 import CreateEventPage from '../pages/admin/CreateEventPage';
 import EventRegistrants from '../pages/admin/EventRegistrants';
+import ScanEntry from '../pages/admin/ScanEntry';
 
 import PrincipalDashboard from '../pages/principal/PrincipalDashboard';
 import AllEvents from '../pages/principal/AllEvents';
 import AdminActivity from '../pages/principal/AdminActivity';
+import EntryLogs from '../pages/principal/EntryLogs';
 
 export default function AppRouter() {
   return (
@@ -43,6 +45,7 @@ export default function AppRouter() {
         <Route path="events/create" element={<CreateEventPage />} />
         <Route path="events/:id/edit" element={<CreateEventPage />} />
         <Route path="events/:id/registrants" element={<EventRegistrants />} />
+        <Route path="scan" element={<ScanEntry />} />
         <Route path="profile" element={<Profile />} />
       </Route>
 
@@ -50,6 +53,7 @@ export default function AppRouter() {
       <Route path="/principal" element={<ProtectedRoute><RoleRoute role="principal"><DashboardLayout title="Principal Dashboard" /></RoleRoute></ProtectedRoute>}>
         <Route index element={<PrincipalDashboard />} />
         <Route path="events" element={<AllEvents />} />
+        <Route path="entry-logs" element={<EntryLogs />} />
         <Route path="activity" element={<AdminActivity />} />
       </Route>
 

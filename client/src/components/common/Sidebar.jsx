@@ -14,11 +14,13 @@ const navItems = {
   admin: [
     { to: '/admin', label: 'Dashboard', icon: '📊' },
     { to: '/admin/events', label: 'Manage Events', icon: '🗂️' },
+    { to: '/admin/scan', label: 'Scan Entry', icon: '📷' },
     { to: '/admin/profile', label: 'Profile', icon: '👤' },
   ],
   principal: [
     { to: '/principal', label: 'Dashboard', icon: '📈' },
     { to: '/principal/events', label: 'All Events', icon: '🎯' },
+    { to: '/principal/entry-logs', label: 'Entry Logs', icon: '🚪' },
     { to: '/principal/activity', label: 'Admin Activity', icon: '🔍' },
   ],
 };

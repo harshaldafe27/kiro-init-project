@@ -63,6 +63,7 @@ export default function EventDetailPage() {
   );
 
   const buildTicket = (reg) => ({
+    registrationId: reg._id,
     specialId: reg.specialId || reg._id,
     studentName: reg.participantDetails?.name || user?.name || 'Participant',
     eventName: event.title,
