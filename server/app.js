@@ -10,7 +10,11 @@ const app = express();
 
 // CORS
 app.use(cors({
-    origin: CLIENT_URL,
+    origin: (origin, callback) => {
+        const allowed = [CLIENT_URL, 'http://localhost:5173', 'http://localhost:5174'];
+        if (!origin || allowed.includes(origin)) return callback(null, true);
+        callback(new Error('Not allowed by CORS'));
+    },
     credentials: true
 }));
 

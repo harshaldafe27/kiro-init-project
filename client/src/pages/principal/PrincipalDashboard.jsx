@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { getPlatformStatsApi } from '../../api/analytics.api';
+import { getPlatformEntryStatsApi } from '../../api/qr.api';
 import Loader from '../../components/common/Loader';
 import ErrorState from '../../components/common/ErrorState';
 
@@ -10,21 +11,30 @@ export default function PrincipalDashboard() {
     queryFn: () => getPlatformStatsApi().then((r) => r.data.data),
   });
 
+  const { data: entryData } = useQuery({
+    queryKey: ['platform-entry-stats'],
+    queryFn: () => getPlatformEntryStatsApi().then((r) => r.data.data),
+    refetchInterval: 15000,
+  });
+
   if (isLoading) return <Loader />;
   if (isError) return <ErrorState onRetry={refetch} />;
 
   const { totalEvents = 0, totalRegistrations = 0, totalRevenue = 0, activeAdmins = 0, categoryBreakdown = {} } = data || {};
+  const { totalEntries = 0, remainingEntries = 0 } = entryData || {};
   const catData = Object.entries(categoryBreakdown).map(([name, value]) => ({ name, value }));
 
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Principal Dashboard</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {[
           { label: 'Total Events', value: totalEvents, icon: '🎯' },
           { label: 'Total Registrations', value: totalRegistrations, icon: '👥' },
           { label: 'Total Revenue', value: `₹${totalRevenue}`, icon: '💰' },
           { label: 'Active Admins', value: activeAdmins, icon: '👨‍💼' },
+          { label: 'Total Entries', value: totalEntries, icon: '✅' },
+          { label: 'Remaining Entries', value: remainingEntries, icon: '⏳' },
         ].map((kpi) => (
           <div key={kpi.label} className="bg-white dark:bg-gray-900 rounded-2xl p-5 border border-gray-100 dark:border-gray-800 shadow-sm">
             <div className="flex items-center justify-between">

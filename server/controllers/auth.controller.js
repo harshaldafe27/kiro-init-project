@@ -13,6 +13,7 @@ const {
     JWT_ACCESS_EXPIRES,
     JWT_REFRESH_EXPIRES
 } = require('../config/env');
+const { isAllowedStudentEmail } = require('../utils/allowedStudents');
 
 const signAccess = (payload) => jwt.sign(payload, JWT_ACCESS_SECRET, {
     expiresIn: JWT_ACCESS_EXPIRES
@@ -48,6 +49,16 @@ const register = async (req, res) => {
 
         const allowedRoles = ['student', 'admin', 'principal'];
         const requestedRole = allowedRoles.includes(role) ? role : 'student';
+
+        // Strict student email validation
+        if (requestedRole === 'student') {
+            if (!isAllowedStudentEmail(email)) {
+                return errorResponse(res,
+                    'Registration is restricted to verified college students. Your email is not in the allowed list.',
+                    403
+                );
+            }
+        }
 
         if (requestedRole === 'admin') {
             const validCode = process.env.ADMIN_SECRET_CODE || 'eventflex@admin2024';

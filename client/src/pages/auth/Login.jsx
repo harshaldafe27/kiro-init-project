@@ -23,12 +23,20 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      // Step 1: Firebase Authentication
-      await signInWithEmailAndPassword(auth, form.email, form.password);
-
-      // Step 2: Get role + JWT from our backend
+      // Always hit backend first to get the user role
       const { data } = await loginApi(form);
       const { user, accessToken } = data.data;
+
+      // Only run Firebase auth for admin/principal (students bypass Firebase)
+      if (user.role !== 'student') {
+        try {
+          await signInWithEmailAndPassword(auth, form.email, form.password);
+        } catch (fbErr) {
+          // Firebase failure is non-blocking for non-student roles if backend succeeded
+          console.warn('Firebase sign-in skipped:', fbErr.code);
+        }
+      }
+
       window.__accessToken__ = accessToken;
       setAuth(user, accessToken);
       toast.success(`Welcome back, ${user.name}! ${roleIcon[user.role] || ''}`);
@@ -42,7 +50,7 @@ export default function Login() {
       } else if (code === 'auth/too-many-requests') {
         setError('Too many attempts. Please try again later');
       } else {
-        setError(err.response?.data?.message || 'Login failed');
+        setError(err.response?.data?.message || err.message || 'Login failed');
       }
     } finally {
       setLoading(false);

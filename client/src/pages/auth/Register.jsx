@@ -33,24 +33,34 @@ export default function Register() {
     if (needsCode && !form.adminCode) return setError('Secret code is required for this role');
     setLoading(true);
     try {
-      // Step 1: Create Firebase Auth account
-      const firebaseUser = await createUserWithEmailAndPassword(auth, form.email, form.password);
-
-      // Step 2: Register in our backend (stores role, name, college etc.)
-      try {
+      if (form.role === 'student') {
+        // Students: backend-only auth (no Firebase — college domain not supported by Firebase)
         const { data } = await registerApi({
           name: form.name, email: form.email, password: form.password,
-          college: form.college, role: form.role, adminCode: form.adminCode,
+          college: form.college, role: form.role,
         });
         const { user, accessToken } = data.data;
         window.__accessToken__ = accessToken;
         setAuth(user, accessToken);
         toast.success('Account created!');
         navigate(roleHome[user.role] || '/student');
-      } catch (backendErr) {
-        // If backend fails, delete the Firebase Auth user to keep in sync
-        await firebaseUser.user.delete();
-        throw backendErr;
+      } else {
+        // Admin / Principal: Firebase + backend
+        const firebaseUser = await createUserWithEmailAndPassword(auth, form.email, form.password);
+        try {
+          const { data } = await registerApi({
+            name: form.name, email: form.email, password: form.password,
+            college: form.college, role: form.role, adminCode: form.adminCode,
+          });
+          const { user, accessToken } = data.data;
+          window.__accessToken__ = accessToken;
+          setAuth(user, accessToken);
+          toast.success('Account created!');
+          navigate(roleHome[user.role] || '/student');
+        } catch (backendErr) {
+          await firebaseUser.user.delete();
+          throw backendErr;
+        }
       }
     } catch (err) {
       const code = err.code;
@@ -61,7 +71,7 @@ export default function Register() {
       } else if (code === 'auth/weak-password') {
         setError('Password must be at least 6 characters');
       } else {
-        setError(err.response?.data?.message || 'Registration failed');
+        setError(err.response?.data?.message || err.message || 'Registration failed');
       }
     } finally {
       setLoading(false);
@@ -98,6 +108,11 @@ export default function Register() {
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
           <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className={inputClass} />
+          {form.role === 'student' && (
+            <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
+              ⚠ Only verified @jdcoem.ac.in college emails are allowed.
+            </p>
+          )}
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">College</label>

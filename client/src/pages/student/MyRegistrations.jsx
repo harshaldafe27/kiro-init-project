@@ -102,6 +102,7 @@ export default function MyRegistrations() {
   };
 
   const buildTicket = (reg) => ({
+    registrationId: reg._id,
     specialId: reg.specialId || reg._id,
     studentName: reg.participantDetails?.name || user?.name || 'Participant',
     eventName: reg.event?.title || 'Event',

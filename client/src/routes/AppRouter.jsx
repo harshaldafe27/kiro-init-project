@@ -58,6 +58,7 @@ export default function AppRouter() {
       <Route path="/principal" element={<ProtectedRoute><RoleRoute role="principal"><DashboardLayout title="Principal Dashboard" /></RoleRoute></ProtectedRoute>}>
         <Route index element={<PrincipalDashboard />} />
         <Route path="events" element={<AllEvents />} />
+        <Route path="entry-logs" element={<EntryLogs />} />
         <Route path="activity" element={<AdminActivity />} />
         <Route path="announcements" element={<PrincipalAnnouncements />} />
         <Route path="approvals" element={<ApprovalRequests />} />
